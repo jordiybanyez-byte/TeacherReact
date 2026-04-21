@@ -1,0 +1,10 @@
+export { VistaProfesor } from './dashboard/VistaProfesor';
+export { ListaEstudiantes } from './features/ListaEstudiantes';
+export { TablaEstudiantes } from './features/TablaEstudiantes';
+export { BadgeEstado } from './ui/BadgeEstado';
+export { BarraProgreso } from './ui/BarraProgreso';
+export { Buscador } from './features/Buscador';
+export { FiltroEstado } from './features/FiltroEstado';
+export { Ordenacion } from './features/Ordenacion';
+export { ThemeProvider, useTheme } from './context/ThemeProvider';
+export { ThemeToggle } from './ui/ThemeToggle';
