@@ -12,22 +12,97 @@ interface Equipo {
   nota?: number;
 }
 
-const equiposMock: Equipo[] = [
-  { id: '1', nombre: 'ReactMasters', miembros: ['Ana García', 'Carlos Martínez'], proyecto: 'App de gestión de tareas', estado: 'en_progreso' },
-  { id: '2', nombre: 'CodeWarriors', miembros: ['Laura López', 'Sofia Hernández'], proyecto: 'Dashboard analytico', estado: 'en_progreso' },
-  { id: '3', nombre: 'DevTeam', miembros: ['David Chen', 'Miguel García'], proyecto: 'Red social para devs', estado: 'inscrito' },
-  { id: '4', nombre: 'TechInnovators', miembros: ['Isabella Castro', 'Carmen Kim'], proyecto: 'Plataforma de learning', estado: 'entregado', nota: 90 },
-  { id: '5', nombre: 'DigitalCrafters', miembros: ['Alejandro Díaz', 'Ricardo Sánchez'], proyecto: 'Marketplace online', estado: 'entregado', nota: 85 },
+interface Hackathon {
+  id: string;
+  titulo: string;
+  descripcion: string;
+  fechaInicio: string;
+  fechaFin: string;
+  premio: string;
+  equipos: Equipo[];
+}
+
+const hackathonsMock: Hackathon[] = [
+  {
+    id: '1',
+    titulo: 'Hackathon React 2026',
+    descripcion: 'Construye la mejor aplicación con React',
+    fechaInicio: '2026-05-15',
+    fechaFin: '2026-05-22',
+    premio: '500€ + Mentoría',
+    equipos: [
+      { id: '1', nombre: 'ReactMasters', miembros: ['Ana García', 'Carlos Martínez'], proyecto: 'App de gestión de tareas', estado: 'en_progreso' },
+      { id: '2', nombre: 'CodeWarriors', miembros: ['Laura López', 'Sofia Hernández'], proyecto: 'Dashboard analytico', estado: 'en_progreso' },
+      { id: '3', nombre: 'DevTeam', miembros: ['David Chen', 'Miguel García'], proyecto: 'Red social para devs', estado: 'inscrito' },
+      { id: '4', nombre: 'TechInnovators', miembros: ['Isabella Castro', 'Carmen Kim'], proyecto: 'Plataforma de learning', estado: 'entregado', nota: 90 },
+    ],
+  },
+];
+
+const estudiantesDisponibles = [
+  'Ana García', 'Carlos Martínez', 'Laura López', 'Sofia Hernández',
+  'David Chen', 'Miguel García', 'Isabella Castro', 'Carmen Kim',
+  'Alejandro Díaz', 'Ricardo Sánchez', 'María Rodríguez', 'Juan Pérez'
 ];
 
 export default function HackathonPage() {
   const { isDark } = useTheme();
-  const [equipos] = useState<Equipo[]>(equiposMock);
-  const [filtro, setFiltro] = useState<'todos' | 'inscrito' | 'en_progreso' | 'entregado'>('todos');
+  const [hackathons, setHackathons] = useState<Hackathon[]>(hackathonsMock);
+  const [hackathonActual, setHackathonActual] = useState<string>(hackathonsMock[0].id);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [alumnosInvitados, setAlumnosInvitados] = useState<string[]>([]);
+  const [nuevoHackathon, setNuevoHackathon] = useState({ titulo: '', descripcion: '', fechaInicio: '', fechaFin: '', premio: '' });
 
-  const equiposFiltrados = filtro === 'todos'
-    ? equipos
-    : equipos.filter(e => e.estado === filtro);
+  const hackathon = hackathons.find(h => h.id === hackathonActual) || hackathons[0];
+
+  const toggleAlumno = (nombre: string) => {
+    setAlumnosInvitados(prev => 
+      prev.includes(nombre) 
+        ? prev.filter(a => a !== nombre)
+        : [...prev, nombre]
+    );
+  };
+
+  const agregarHackathon = () => {
+    if (!nuevoHackathon.titulo.trim()) return;
+    
+    const equipos: Equipo[] = [];
+    
+    const chunkSize = 4;
+    for (let i = 0; i < alumnosInvitados.length; i += chunkSize) {
+      const miembros = alumnosInvitados.slice(i, i + chunkSize);
+      equipos.push({
+        id: String(Date.now()) + i,
+        nombre: `Equipo ${Math.floor(i / chunkSize) + 1}`,
+        miembros: miembros,
+        proyecto: 'Sin proyecto',
+        estado: 'inscrito',
+      });
+    }
+    
+    const hackathonNuevo: Hackathon = {
+      id: String(Date.now()),
+      titulo: nuevoHackathon.titulo,
+      descripcion: nuevoHackathon.descripcion,
+      fechaInicio: nuevoHackathon.fechaInicio,
+      fechaFin: nuevoHackathon.fechaFin,
+      premio: nuevoHackathon.premio,
+      equipos,
+    };
+    
+    setHackathons([...hackathons, hackathonNuevo]);
+    setHackathonActual(hackathonNuevo.id);
+    setNuevoHackathon({ titulo: '', descripcion: '', fechaInicio: '', fechaFin: '', premio: '' });
+    setAlumnosInvitados([]);
+    setMostrarFormulario(false);
+  };
+
+  const eliminarHackathon = (id: string) => {
+    setHackathons(hackathons.filter(h => h.id !== id));
+    if (hackathonActual === id && hackathons.length > 1) {
+      setHackathonActual(hackathons.find(h => h.id !== id)?.id || '');
+    }
+  };
 
   const getEstadoColor = (estado: string) => {
     switch (estado) {
@@ -37,51 +112,186 @@ export default function HackathonPage() {
     }
   };
 
+  const equiposFiltrados = hackathon.equipos;
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-          Gestión de Hackathon
-        </h1>
-        <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
-          Administra los equipos y proyectos del hackathon
-        </p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            Gestión de Hackathon
+          </h1>
+          <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
+            Administra hackathons, equipos y proyectos
+          </p>
+        </div>
+        <button
+          onClick={() => setMostrarFormulario(!mostrarFormulario)}
+          className={`px-4 py-2 rounded-lg transition ${
+            isDark ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600 hover:bg-blue-700'
+          } text-white`}
+        >
+          Nuevo Hackathon
+        </button>
       </div>
 
+      <div className={`p-4 rounded-lg border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <label className={`block text-sm mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Seleccionar Hackathon</label>
+        <select
+          value={hackathonActual}
+          onChange={(e) => setHackathonActual(e.target.value)}
+          className={`w-full px-4 py-2 border rounded-lg ${
+            isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
+          }`}
+        >
+          {hackathons.map(h => (
+            <option key={h.id} value={h.id}>{h.titulo}</option>
+          ))}
+        </select>
+      </div>
+
+      {mostrarFormulario && (
+        <div className={`p-6 rounded-xl border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <h2 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            Crear Nuevo Hackathon
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Título</label>
+              <input
+                type="text"
+                value={nuevoHackathon.titulo}
+                onChange={(e) => setNuevoHackathon({ ...nuevoHackathon, titulo: e.target.value })}
+                className={`w-full px-4 py-2 border rounded-lg ${
+                  isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
+                }`}
+                placeholder="Nombre del hackathon"
+              />
+            </div>
+            <div>
+              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Premio</label>
+              <input
+                type="text"
+                value={nuevoHackathon.premio}
+                onChange={(e) => setNuevoHackathon({ ...nuevoHackathon, premio: e.target.value })}
+                className={`w-full px-4 py-2 border rounded-lg ${
+                  isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
+                }`}
+                placeholder="Ej: 500€"
+              />
+            </div>
+            <div>
+              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Fecha de inicio</label>
+              <input
+                type="date"
+                value={nuevoHackathon.fechaInicio}
+                onChange={(e) => setNuevoHackathon({ ...nuevoHackathon, fechaInicio: e.target.value })}
+                className={`w-full px-4 py-2 border rounded-lg ${
+                  isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
+                }`}
+              />
+            </div>
+            <div>
+              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Fecha de fin</label>
+              <input
+                type="date"
+                value={nuevoHackathon.fechaFin}
+                onChange={(e) => setNuevoHackathon({ ...nuevoHackathon, fechaFin: e.target.value })}
+                className={`w-full px-4 py-2 border rounded-lg ${
+                  isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
+                }`}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Descripción</label>
+              <textarea
+                value={nuevoHackathon.descripcion}
+                onChange={(e) => setNuevoHackathon({ ...nuevoHackathon, descripcion: e.target.value })}
+                className={`w-full px-4 py-2 border rounded-lg ${
+                  isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
+                }`}
+                rows={2}
+              />
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <label className={`block text-sm mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              Invitar Alumnos ({alumnosInvitados.length} seleccionados)
+            </label>
+            <p className={`text-xs mb-3 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+              Los alumnos se organizarán automáticamente en equipos de hasta 4 personas
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {estudiantesDisponibles.map((estudiante) => (
+                <button
+                  key={estudiante}
+                  type="button"
+                  onClick={() => toggleAlumno(estudiante)}
+                  className={`px-3 py-2 rounded-lg text-sm transition ${
+                    alumnosInvitados.includes(estudiante)
+                      ? (isDark ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white')
+                      : (isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
+                  }`}
+                >
+                  {alumnosInvitados.includes(estudiante) ? '✓ ' : '+ '}{estudiante}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-2 mt-6">
+            <button
+              onClick={agregarHackathon}
+              className={`px-4 py-2 rounded-lg transition ${
+                isDark ? 'bg-green-600 hover:bg-green-700' : 'bg-green-600 hover:bg-green-700'
+              } text-white`}
+            >
+              Crear Hackathon
+            </button>
+            <button
+              onClick={() => { setMostrarFormulario(false); setAlumnosInvitados([]); }}
+              className={`px-4 py-2 rounded-lg transition ${
+                isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-400 hover:bg-gray-500'
+              } text-white`}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className={`p-6 rounded-xl border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <h2 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-          Información del Hackathon
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="flex justify-between items-start">
+          <div>
+            <h2 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              {hackathon.titulo}
+            </h2>
+            <p className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{hackathon.descripcion}</p>
+          </div>
+          <button
+            onClick={() => eliminarHackathon(hackathonActual)}
+            className={`px-3 py-1 rounded-lg text-sm transition ${
+              isDark ? 'bg-red-600 hover:bg-red-700' : 'bg-red-600 hover:bg-red-700'
+            } text-white`}
+          >
+            Eliminar
+          </button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
           <div>
             <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Fecha de inicio</p>
-            <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>15 Mayo 2026</p>
+            <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{hackathon.fechaInicio || 'Sin definir'}</p>
           </div>
           <div>
             <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Fecha de entrega</p>
-            <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>22 Mayo 2026</p>
+            <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{hackathon.fechaFin || 'Sin definir'}</p>
           </div>
           <div>
             <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Premio</p>
-            <p className={`font-medium ${isDark ? 'text-yellow-400' : 'text-yellow-600'}`}>500€ + Mentoría</p>
+            <p className={`font-medium ${isDark ? 'text-yellow-400' : 'text-yellow-600'}`}>{hackathon.premio || 'Sin premio'}</p>
           </div>
         </div>
-      </div>
-
-      <div className="flex gap-2">
-        {(['todos', 'inscrito', 'en_progreso', 'entregado'] as const).map((f) => (
-          <button
-            key={f}
-            onClick={() => setFiltro(f)}
-            className={`px-4 py-2 rounded-lg capitalize transition ${
-              filtro === f
-                ? 'bg-blue-600 text-white'
-                : isDark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-            }`}
-          >
-            {f.replace('_', ' ')}
-          </button>
-        ))}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -117,8 +327,14 @@ export default function HackathonPage() {
         ))}
       </div>
 
+      {equiposFiltrados.length === 0 && (
+        <div className={`text-center py-12 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+          No hay equipos en este hackathon. Crea uno nuevo e invita alumnos.
+        </div>
+      )}
+
       <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-        Mostrando {equiposFiltrados.length} de {equipos.length} equipos
+        Total de equipos: {equiposFiltrados.length}
       </div>
     </div>
   );
