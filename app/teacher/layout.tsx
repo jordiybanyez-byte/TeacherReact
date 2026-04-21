@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, ReactNode } from 'react';
+import { useEffect, useState, ReactNode } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ThemeProvider, useTheme } from './components/ThemeContext';
 
@@ -27,11 +27,12 @@ function ThemeToggle() {
 
 function LayoutContent({ children }: { children: ReactNode }) {
   const { isDark } = useTheme();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <div className={`flex min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      <Sidebar isDark={isDark} />
-      <main className="flex-1 flex flex-col">
+      <Sidebar isDark={isDark} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
+      <main className="flex-1 flex flex-col transition-all duration-300">
         <header className={`h-16 border-b flex items-center justify-end px-6 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <ThemeToggle />
         </header>

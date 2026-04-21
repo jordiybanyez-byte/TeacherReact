@@ -2,9 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 
 interface SidebarProps {
   isDark: boolean;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
 const menuItems = [
@@ -54,18 +57,32 @@ function getIcon(icon: string, isActive: boolean, isDark: boolean) {
   }
 }
 
-export function Sidebar({ isDark }: SidebarProps) {
+export function Sidebar({ isDark, isCollapsed, onToggleCollapse }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className={`w-64 min-h-screen border-r ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} flex flex-col`}>
-      <div className={`p-6 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-        <h1 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-          Teacher Hub
-        </h1>
-        <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-          MOOC React
-        </p>
+    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} min-h-screen border-r transition-all duration-300 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} flex flex-col`}>
+      <div className={`flex items-center justify-between p-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+        {!isCollapsed && (
+          <>
+            <div>
+              <h1 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                Teacher Hub
+              </h1>
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                MOOC React
+              </p>
+            </div>
+          </>
+        )}
+        <button
+          onClick={onToggleCollapse}
+          className={`p-2 rounded-lg transition ${isDark ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
+        >
+          <svg className="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transform: isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+          </svg>
+        </button>
       </div>
       
       <nav className="flex-1 p-4">
@@ -76,16 +93,18 @@ export function Sidebar({ isDark }: SidebarProps) {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                  className={`flex items-center gap-3 px-3 py-3 rounded-lg transition ${
                     isActive
                       ? (isDark ? 'bg-gray-700' : 'bg-gray-100')
                       : (isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50')
-                  }`}
+                  } ${isCollapsed ? 'justify-center' : ''}`}
                 >
                   {getIcon(item.icon, isActive, isDark)}
-                  <span className={isDark ? 'text-white' : 'text-gray-700'}>
-                    {item.label}
-                  </span>
+                  {!isCollapsed && (
+                    <span className={isDark ? 'text-white' : 'text-gray-700'}>
+                      {item.label}
+                    </span>
+                  )}
                 </Link>
               </li>
             );
