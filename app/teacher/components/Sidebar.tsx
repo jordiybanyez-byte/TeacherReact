@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { useTheme } from './ThemeContext';
 
 interface SidebarProps {
   isDark: boolean;
@@ -59,6 +60,15 @@ function getIcon(icon: string, isActive: boolean, isDark: boolean) {
 
 export function Sidebar({ isDark, isCollapsed, onToggleCollapse }: SidebarProps) {
   const pathname = usePathname();
+  const { t } = useTheme();
+
+  const menuItems = [
+    { href: '/teacher', label: t.inicio, icon: 'home' },
+    { href: '/teacher/estudiantes', label: t.estudiantes, icon: 'users' },
+    { href: '/teacher/ejercicios', label: t.ejercicios, icon: 'clipboard' },
+    { href: '/teacher/hackathon', label: t.hackathon, icon: 'code' },
+    { href: '/teacher/cursos', label: t.cursos, icon: 'book' },
+  ];
 
   return (
     <aside className={`${isCollapsed ? 'w-16' : 'w-64'} min-h-screen border-r transition-all duration-300 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} flex flex-col`}>
@@ -67,10 +77,10 @@ export function Sidebar({ isDark, isCollapsed, onToggleCollapse }: SidebarProps)
           <>
             <div>
               <h1 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                Teacher Hub
+                {t.teacherHub}
               </h1>
               <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                MOOC React
+                {t.moocReact}
               </p>
             </div>
           </>

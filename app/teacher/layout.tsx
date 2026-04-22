@@ -3,13 +3,15 @@
 import { useEffect, useState, ReactNode } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ThemeProvider, useTheme } from './components/ThemeContext';
+import { Language } from './components/i18n';
 
 function ThemeToggle() {
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark, toggleTheme, t } = useTheme();
 
   return (
     <button
       onClick={toggleTheme}
+      title={isDark ? t.temaClaro : t.temaOscuro}
       className={`p-2 rounded-lg transition ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
     >
       {isDark ? (
@@ -25,6 +27,28 @@ function ThemeToggle() {
   );
 }
 
+function LanguageToggle() {
+  const { isDark, language, setLanguage, t } = useTheme();
+
+  return (
+    <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-700">
+      {(['es', 'ca', 'en'] as const).map((lang) => (
+        <button
+          key={lang}
+          onClick={() => setLanguage(lang)}
+          className={`px-2 py-1 text-sm rounded transition ${
+            language === lang
+              ? 'bg-blue-600 text-white'
+              : isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          {lang.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function LayoutContent({ children }: { children: ReactNode }) {
   const { isDark } = useTheme();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -33,7 +57,8 @@ function LayoutContent({ children }: { children: ReactNode }) {
     <div className={`flex min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <Sidebar isDark={isDark} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
       <main className="flex-1 flex flex-col transition-all duration-300">
-        <header className={`h-16 border-b flex items-center justify-end px-6 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <header className={`h-16 border-b flex items-center justify-end gap-3 px-6 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <LanguageToggle />
           <ThemeToggle />
         </header>
         <div className="flex-1 p-6">
