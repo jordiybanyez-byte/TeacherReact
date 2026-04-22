@@ -76,7 +76,7 @@ export const translations: Record<Language, Translations> = {
   },
   en: {
     inicio: 'Home',
-    students: 'Students',
+    estudiantes: 'Students',
     ejercicios: 'Exercises',
     hackathon: 'Hackathon',
     cursos: 'Courses',

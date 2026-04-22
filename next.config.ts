@@ -1,9 +1,7 @@
-import type { NextConfig } from "next";
-
+import type { NextConfig } from 'next'
+ 
 const nextConfig: NextConfig = {
-  experimental: {
-    resolveExtensions: [".tsx", ".ts", ".jsx", ".js"],
-  },
-};
-
-export default nextConfig;
+  /* config options here */
+}
+ 
+export default nextConfig
