@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useTheme } from '../components/ThemeContext';
 import { estudiantes } from '../data/estudiantes';
+import { CodeEditor } from '../components/CodeEditor';
+import { CodePreview } from '../components/CodePreview';
 
 interface Ejercicio {
   id: string;
@@ -153,11 +155,9 @@ export default function EjerciciosPage() {
 
           <div className="mb-4">
             <p className={`text-sm font-medium mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-              {language === 'es' ? 'Código inicial:' : language === 'ca' ? 'Codi inicial:' : 'Initial code:'}
+              {language === 'es' ? 'Código:' : language === 'ca' ? 'Codi:' : 'Code:'}
             </p>
-            <pre className={`p-4 rounded-lg overflow-x-auto text-sm font-mono ${isDark ? 'bg-gray-900 text-green-400' : 'bg-gray-100 text-green-700'}`}>
-              {ejercicioActual.codigoInicio}
-            </pre>
+            <CodeEditor initialCode={ejercicioActual.codigoInicio} isDark={isDark} />
           </div>
 
           <details className={`p-4 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
@@ -176,6 +176,12 @@ export default function EjerciciosPage() {
             <pre className={`mt-2 p-4 rounded-lg overflow-x-auto text-sm font-mono ${isDark ? 'bg-gray-900 text-green-400' : 'bg-gray-100 text-green-700'}`}>
               {ejercicioActual.solucion}
             </pre>
+            <div className="mt-4">
+              <p className={`text-sm font-medium mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                {language === 'es' ? 'Preview solución:' : language === 'ca' ? 'Preview solució:' : 'Solution preview:'}
+              </p>
+              <CodePreview code={ejercicioActual.solucion} isDark={isDark} />
+            </div>
           </details>
         </div>
 
