@@ -33,8 +33,6 @@ const hackathonsMock: Hackathon[] = [
     equipos: [
       { id: '1', nombre: 'ReactMasters', miembros: ['Ana García', 'Carlos Martínez'], proyecto: 'App de gestión de tareas', estado: 'en_progreso' },
       { id: '2', nombre: 'CodeWarriors', miembros: ['Laura López', 'Sofia Hernández'], proyecto: 'Dashboard analytico', estado: 'en_progreso' },
-      { id: '3', nombre: 'DevTeam', miembros: ['David Chen', 'Miguel García'], proyecto: 'Red social para devs', estado: 'inscrito' },
-      { id: '4', nombre: 'TechInnovators', miembros: ['Isabella Castro', 'Carmen Kim'], proyecto: 'Plataforma de learning', estado: 'entregado', nota: 90 },
     ],
   },
 ];
@@ -42,11 +40,10 @@ const hackathonsMock: Hackathon[] = [
 const estudiantesDisponibles = [
   'Ana García', 'Carlos Martínez', 'Laura López', 'Sofia Hernández',
   'David Chen', 'Miguel García', 'Isabella Castro', 'Carmen Kim',
-  'Alejandro Díaz', 'Ricardo Sánchez', 'María Rodríguez', 'Juan Pérez'
 ];
 
 export default function HackathonPage() {
-  const { isDark } = useTheme();
+  const { isDark, t } = useTheme();
   const [hackathons, setHackathons] = useState<Hackathon[]>(hackathonsMock);
   const [hackathonActual, setHackathonActual] = useState<string>(hackathonsMock[0].id);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
@@ -67,7 +64,6 @@ export default function HackathonPage() {
     if (!nuevoHackathon.titulo.trim()) return;
     
     const equipos: Equipo[] = [];
-    
     const chunkSize = 4;
     for (let i = 0; i < alumnosInvitados.length; i += chunkSize) {
       const miembros = alumnosInvitados.slice(i, i + chunkSize);
@@ -104,7 +100,7 @@ export default function HackathonPage() {
     }
   };
 
-  const getEstadoColor = (estado: string) => {
+  const getEstadoColor = (estado: string, isDark: boolean) => {
     switch (estado) {
       case 'entregado': return isDark ? 'bg-green-900 text-green-200 border-green-700' : 'bg-green-100 text-green-800 border-green-200';
       case 'en_progreso': return isDark ? 'bg-blue-900 text-blue-200 border-blue-700' : 'bg-blue-100 text-blue-800 border-blue-200';
@@ -112,17 +108,17 @@ export default function HackathonPage() {
     }
   };
 
-  const equiposFiltrados = hackathon.equipos;
+  const equiposFiltrados = hackathon?.equipos || [];
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            Gestión de Hackathon
+            {t.gestionHackathon}
           </h1>
           <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
-            Administra hackathons, equipos y proyectos
+            {t.adminHackathon}
           </p>
         </div>
         <button
@@ -131,12 +127,12 @@ export default function HackathonPage() {
             isDark ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600 hover:bg-blue-700'
           } text-white`}
         >
-          Nuevo Hackathon
+          {mostrarFormulario ? t.cancel : t.newHackathon}
         </button>
       </div>
 
       <div className={`p-4 rounded-lg border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <label className={`block text-sm mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Seleccionar Hackathon</label>
+        <label className={`block text-sm mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t.selectHackathon}</label>
         <select
           value={hackathonActual}
           onChange={(e) => setHackathonActual(e.target.value)}
@@ -153,11 +149,11 @@ export default function HackathonPage() {
       {mostrarFormulario && (
         <div className={`p-6 rounded-xl border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <h2 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            Crear Nuevo Hackathon
+            {t.crearNuevoHackathon}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Título</label>
+              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t.titulo}</label>
               <input
                 type="text"
                 value={nuevoHackathon.titulo}
@@ -165,11 +161,10 @@ export default function HackathonPage() {
                 className={`w-full px-4 py-2 border rounded-lg ${
                   isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
                 }`}
-                placeholder="Nombre del hackathon"
               />
             </div>
             <div>
-              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Premio</label>
+              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t.premio}</label>
               <input
                 type="text"
                 value={nuevoHackathon.premio}
@@ -177,11 +172,10 @@ export default function HackathonPage() {
                 className={`w-full px-4 py-2 border rounded-lg ${
                   isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
                 }`}
-                placeholder="Ej: 500€"
               />
             </div>
             <div>
-              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Fecha de inicio</label>
+              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t.fechaInicio}</label>
               <input
                 type="date"
                 value={nuevoHackathon.fechaInicio}
@@ -192,7 +186,7 @@ export default function HackathonPage() {
               />
             </div>
             <div>
-              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Fecha de fin</label>
+              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t.fechaFin}</label>
               <input
                 type="date"
                 value={nuevoHackathon.fechaFin}
@@ -203,7 +197,7 @@ export default function HackathonPage() {
               />
             </div>
             <div className="md:col-span-2">
-              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Descripción</label>
+              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t.descripcion}</label>
               <textarea
                 value={nuevoHackathon.descripcion}
                 onChange={(e) => setNuevoHackathon({ ...nuevoHackathon, descripcion: e.target.value })}
@@ -217,10 +211,10 @@ export default function HackathonPage() {
 
           <div className="mt-6">
             <label className={`block text-sm mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              Invitar Alumnos ({alumnosInvitados.length} seleccionados)
+              {t.inviteAlumns} ({alumnosInvitados.length} {t.selectAlumns})
             </label>
             <p className={`text-xs mb-3 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-              Los alumnos se organizarán automáticamente en equipos de hasta 4 personas
+              {t.inviteAlumnsHint}
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {estudiantesDisponibles.map((estudiante) => (
@@ -230,8 +224,8 @@ export default function HackathonPage() {
                   onClick={() => toggleAlumno(estudiante)}
                   className={`px-3 py-2 rounded-lg text-sm transition ${
                     alumnosInvitados.includes(estudiante)
-                      ? (isDark ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white')
-                      : (isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
+                      ? 'bg-blue-600 text-white'
+                      : isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {alumnosInvitados.includes(estudiante) ? '✓ ' : '+ '}{estudiante}
@@ -247,7 +241,7 @@ export default function HackathonPage() {
                 isDark ? 'bg-green-600 hover:bg-green-700' : 'bg-green-600 hover:bg-green-700'
               } text-white`}
             >
-              Crear Hackathon
+              {t.createHackathon}
             </button>
             <button
               onClick={() => { setMostrarFormulario(false); setAlumnosInvitados([]); }}
@@ -255,44 +249,44 @@ export default function HackathonPage() {
                 isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-400 hover:bg-gray-500'
               } text-white`}
             >
-              Cancelar
+              {t.cancel}
             </button>
           </div>
         </div>
       )}
 
-      <div className={`p-6 rounded-xl border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-              {hackathon.titulo}
-            </h2>
-            <p className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{hackathon.descripcion}</p>
+      {hackathon && (
+        <div className={`p-6 rounded-xl border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <div className="flex justify-between items-start">
+            <div>
+              <h2 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                {hackathon.titulo}
+              </h2>
+              <p className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{hackathon.descripcion}</p>
+            </div>
+            <button
+              onClick={() => eliminarHackathon(hackathonActual)}
+              className="px-3 py-1 rounded-lg text-sm transition bg-red-600 hover:bg-red-700 text-white font-medium"
+            >
+              Eliminar
+            </button>
           </div>
-          <button
-            onClick={() => eliminarHackathon(hackathonActual)}
-            className={`px-3 py-1 rounded-lg text-sm transition ${
-              isDark ? 'bg-red-600 hover:bg-red-700' : 'bg-red-600 hover:bg-red-700'
-            } text-white`}
-          >
-            Eliminar
-          </button>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+            <div>
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t.fechaInicio}</p>
+              <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{hackathon.fechaInicio || '-'}</p>
+            </div>
+            <div>
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t.fechaFin}</p>
+              <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{hackathon.fechaFin || '-'}</p>
+            </div>
+            <div>
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t.premio}</p>
+              <p className={`font-medium ${isDark ? 'text-yellow-400' : 'text-yellow-600'}`}>{hackathon.premio || '-'}</p>
+            </div>
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-          <div>
-            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Fecha de inicio</p>
-            <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{hackathon.fechaInicio || 'Sin definir'}</p>
-          </div>
-          <div>
-            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Fecha de entrega</p>
-            <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{hackathon.fechaFin || 'Sin definir'}</p>
-          </div>
-          <div>
-            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Premio</p>
-            <p className={`font-medium ${isDark ? 'text-yellow-400' : 'text-yellow-600'}`}>{hackathon.premio || 'Sin premio'}</p>
-          </div>
-        </div>
-      </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {equiposFiltrados.map((equipo) => (
@@ -309,8 +303,8 @@ export default function HackathonPage() {
                   {equipo.proyecto}
                 </p>
               </div>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getEstadoColor(equipo.estado)}`}>
-                {equipo.estado.replace('_', ' ')}
+              <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getEstadoColor(equipo.estado, isDark)}`}>
+                {equipo.estado}
               </span>
             </div>
 
@@ -320,7 +314,7 @@ export default function HackathonPage() {
 
             {equipo.estado === 'entregado' && (
               <div className={`text-lg font-bold ${isDark ? 'text-green-400' : 'text-green-600'}`}>
-                Nota: {equipo.nota}/100
+                {t.note}: {equipo.nota}/100
               </div>
             )}
           </div>
@@ -329,12 +323,12 @@ export default function HackathonPage() {
 
       {equiposFiltrados.length === 0 && (
         <div className={`text-center py-12 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-          No hay equipos en este hackathon. Crea uno nuevo e invita alumnos.
+          {t.noEquipos}
         </div>
       )}
 
       <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-        Total de equipos: {equiposFiltrados.length}
+        {t.totalCourses}: {equiposFiltrados.length} {t.teams}
       </div>
     </div>
   );

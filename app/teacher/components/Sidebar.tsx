@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
 import { useTheme } from './ThemeContext';
 
 interface SidebarProps {
@@ -10,14 +9,6 @@ interface SidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
 }
-
-const menuItems = [
-  { href: '/teacher', label: 'Inicio', icon: 'home' },
-  { href: '/teacher/estudiantes', label: 'Estudiantes', icon: 'users' },
-  { href: '/teacher/ejercicios', label: 'Ejercicios', icon: 'clipboard' },
-  { href: '/teacher/hackathon', label: 'Hackathon', icon: 'code' },
-  { href: '/teacher/cursos', label: 'Cursos', icon: 'book' },
-];
 
 function getIcon(icon: string, isActive: boolean, isDark: boolean) {
   const color = isActive ? (isDark ? 'text-blue-400' : 'text-blue-600') : (isDark ? 'text-gray-400' : 'text-gray-500');
@@ -121,6 +112,28 @@ export function Sidebar({ isDark, isCollapsed, onToggleCollapse }: SidebarProps)
           })}
         </ul>
       </nav>
+      
+      <div className="p-4 border-t border-gray-700">
+        <button
+          onClick={() => {
+            localStorage.removeItem('theme');
+            localStorage.removeItem('language');
+            window.location.href = '/login';
+          }}
+          className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition ${
+            isDark ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-50 text-gray-500'
+          } ${isCollapsed ? 'justify-center' : ''}`}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          {!isCollapsed && (
+            <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>
+              {t.cerrarSesion || 'Cerrar sesión'}
+            </span>
+          )}
+        </button>
+      </div>
     </aside>
   );
 }

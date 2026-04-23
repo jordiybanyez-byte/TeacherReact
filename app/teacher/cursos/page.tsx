@@ -18,7 +18,7 @@ const cursosMock: Curso[] = [
 ];
 
 export default function CursosPage() {
-  const { isDark } = useTheme();
+  const { isDark, t } = useTheme();
   const [cursos, setCursos] = useState<Curso[]>(cursosMock);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [nuevoCurso, setNuevoCurso] = useState({ titulo: '', descripcion: '', duracion: '' });
@@ -44,11 +44,20 @@ export default function CursosPage() {
     setCursos(cursos.filter(c => c.id !== id));
   };
 
-  const getEstadoColor = (estado: string) => {
+  const getEstadoColor = (estado: string, isDark: boolean) => {
     switch (estado) {
       case 'activo': return isDark ? 'bg-green-900 text-green-200 border-green-700' : 'bg-green-100 text-green-800 border-green-200';
       case 'inactivo': return isDark ? 'bg-gray-700 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-800 border-gray-200';
       default: return isDark ? 'bg-yellow-900 text-yellow-200 border-yellow-700' : 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    }
+  };
+
+  const getEstadoLabel = (estado: string, t: any) => {
+    switch (estado) {
+      case 'activo': return t.active;
+      case 'inactivo': return t.inactive;
+      case 'borrador': return t.draft;
+      default: return estado;
     }
   };
 
@@ -57,10 +66,10 @@ export default function CursosPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            Gestión de Cursos
+            {t.gestionCursos}
           </h1>
           <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
-            Crea y administra los cursos del MOOC
+            {t.adminCursos}
           </p>
         </div>
         <button
@@ -69,18 +78,18 @@ export default function CursosPage() {
             isDark ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600 hover:bg-blue-700'
           } text-white`}
         >
-          {mostrarFormulario ? 'Cancelar' : 'Nuevo Curso'}
+          {mostrarFormulario ? t.cancel : t.newCourse}
         </button>
       </div>
 
       {mostrarFormulario && (
         <div className={`p-6 rounded-xl border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <h2 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            Crear Nuevo Curso
+            {t.crearNuevoCurso}
           </h2>
           <div className="space-y-4">
             <div>
-              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Título</label>
+              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t.titulo}</label>
               <input
                 type="text"
                 value={nuevoCurso.titulo}
@@ -88,23 +97,21 @@ export default function CursosPage() {
                 className={`w-full px-4 py-2 border rounded-lg ${
                   isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
                 }`}
-                placeholder="Nombre del curso"
               />
             </div>
             <div>
-              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Descripción</label>
+              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t.descripcion}</label>
               <textarea
                 value={nuevoCurso.descripcion}
                 onChange={(e) => setNuevoCurso({ ...nuevoCurso, descripcion: e.target.value })}
                 className={`w-full px-4 py-2 border rounded-lg ${
                   isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
                 }`}
-                placeholder="Descripción del curso"
                 rows={3}
               />
             </div>
             <div>
-              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Duración</label>
+              <label className={`block text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t.duracion}</label>
               <input
                 type="text"
                 value={nuevoCurso.duracion}
@@ -112,7 +119,6 @@ export default function CursosPage() {
                 className={`w-full px-4 py-2 border rounded-lg ${
                   isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
                 }`}
-                placeholder="Ej: 8 semanas"
               />
             </div>
             <button
@@ -121,7 +127,7 @@ export default function CursosPage() {
                 isDark ? 'bg-green-600 hover:bg-green-700' : 'bg-green-600 hover:bg-green-700'
               } text-white`}
             >
-              Crear Curso
+              {t.createCourse}
             </button>
           </div>
         </div>
@@ -142,22 +148,20 @@ export default function CursosPage() {
                   {curso.descripcion}
                 </p>
               </div>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getEstadoColor(curso.estado)}`}>
-                {curso.estado}
+              <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getEstadoColor(curso.estado, isDark)}`}>
+                {getEstadoLabel(curso.estado, t)}
               </span>
             </div>
             
             <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-4 space-y-1`}>
-              <p>Duración: {curso.duracion}</p>
-              <p>Inicio: {curso.fechaInicio}</p>
+              <p>{t.duracion}: {curso.duracion}</p>
+              <p>{t.fechaInicio}: {curso.fechaInicio}</p>
             </div>
 
             <div className="flex gap-2">
               <button
                 onClick={() => eliminarCurso(curso.id)}
-                className={`px-4 py-2 rounded-lg transition ${
-                  isDark ? 'bg-red-600 hover:bg-red-700' : 'bg-red-600 hover:bg-red-700'
-                } text-white`}
+                className="px-4 py-2 rounded-lg transition bg-red-600 hover:bg-red-700 text-white font-medium"
               >
                 Eliminar
               </button>
@@ -168,12 +172,12 @@ export default function CursosPage() {
 
       {cursos.length === 0 && (
         <div className={`text-center py-12 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-          No hay cursos creados. Crea uno nuevo para comenzar.
+          {t.noCourses}
         </div>
       )}
 
       <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-        Total de cursos: {cursos.length}
+        {t.totalCourses}: {cursos.length}
       </div>
     </div>
   );

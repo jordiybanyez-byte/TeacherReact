@@ -3,8 +3,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Language, translations, Translations } from './i18n';
 
-type Theme = 'light' | 'dark';
-
 interface ThemeContextType {
   isDark: boolean;
   toggleTheme: () => void;
@@ -28,6 +26,7 @@ export function useTheme() {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [isDark, setIsDark] = useState(false);
   const [language, setLanguage] = useState<Language>('es');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const theme = document.documentElement.getAttribute('data-theme');
@@ -37,6 +36,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (savedLang && (savedLang === 'es' || savedLang === 'ca' || savedLang === 'en')) {
       setLanguage(savedLang);
     }
+    setMounted(true);
   }, []);
 
   const toggleTheme = () => {
@@ -51,14 +51,24 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('language', lang);
   };
 
+  const value = { 
+    isDark, 
+    toggleTheme, 
+    language, 
+    setLanguage: handleSetLanguage,
+    t: translations[language],
+  };
+
+  if (!mounted) {
+    return (
+      <ThemeContext.Provider value={value}>
+        <div className="min-h-screen bg-white dark:bg-gray-900" />
+      </ThemeContext.Provider>
+    );
+  }
+
   return (
-    <ThemeContext.Provider value={{ 
-      isDark, 
-      toggleTheme, 
-      language, 
-      setLanguage: handleSetLanguage,
-      t: translations[language],
-    }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );

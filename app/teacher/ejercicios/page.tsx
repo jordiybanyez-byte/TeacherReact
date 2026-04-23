@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useTheme } from '../components/ThemeContext';
 import { estudiantes } from '../data/estudiantes';
-import { useEffect } from 'react';
 
 interface Ejercicio {
   id: string;
