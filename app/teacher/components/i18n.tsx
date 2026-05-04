@@ -66,6 +66,13 @@ export interface Translations {
   inviteAlumnsHint: string;
   selectAlumns: string;
   createHackathon: string;
+  invitarAlumnos: string;
+  invitarCorreo: string;
+  enviarInvitacion: string;
+  emailAlumno: string;
+  listaAlumnos: string;
+  agregarCurso: string;
+  noAlumnosInvitados: string;
   deleteHackathon: string;
   cancel: string;
   delete: string;
@@ -152,6 +159,14 @@ export const translations: Record<Language, Translations> = {
     inviteAlumnsHint: 'Los alumnos se organizarán automáticamente en equipos',
     selectAlumns: 'seleccionados',
     createHackathon: 'Crear Hackathon',
+    invitarAlumnos: 'Invitar Alumnos',
+    invitarCorreo: 'Invitar por correo',
+    enviarInvitacion: 'Enviar invitación',
+    emailAlumno: 'Email del alumno',
+    listaAlumnos: 'Lista de alumnos',
+    agregarCurso: 'Agregar a curso',
+    noAlumnosInvitados: 'No hay alumnos invitados aún',
+    listaEjercicios: 'Lista de ejercicios',
     deleteHackathon: 'Eliminar Hackathon',
     cancel: 'Cancelar',
     delete: 'Eliminar',
@@ -236,6 +251,14 @@ export const translations: Record<Language, Translations> = {
     inviteAlumnsHint: "Els alumnes s'organitzaran automàticament en equips",
     selectAlumns: 'seleccionats',
     createHackathon: 'Crear Hackathon',
+    invitarAlumnos: 'Convidar Alumnes',
+    invitarCorreo: 'Convidar per correu',
+    enviarInvitacion: 'Enviar invitació',
+    emailAlumno: "Email de l'alumne",
+    listaAlumnos: 'Llista d\'alumnes',
+    agregarCurso: 'Afegir al curs',
+    noAlumnosInvitados: 'No hi ha alumnes convidats encara',
+    listaEjercicios: 'Llista d\'exercicis',
     deleteHackathon: 'Eliminar Hackathon',
     cancel: 'Cancelar',
     delete: 'Eliminar',
@@ -320,6 +343,14 @@ export const translations: Record<Language, Translations> = {
     inviteAlumnsHint: 'Students will be organized into teams automatically',
     selectAlumns: 'selected',
     createHackathon: 'Create Hackathon',
+    invitarAlumnos: 'Invite Students',
+    invitarCorreo: 'Invite by email',
+    enviarInvitacion: 'Send invitation',
+    emailAlumno: 'Student email',
+    listaAlumnos: 'Students list',
+    agregarCurso: 'Add to course',
+    noAlumnosInvitados: 'No students invited yet',
+    listaEjercicios: 'Exercises list',
     deleteHackathon: 'Delete Hackathon',
     cancel: 'Cancel',
     delete: 'Delete',

@@ -1,104 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useTheme } from '../components/ThemeContext';
 import { estudiantes } from '../data/estudiantes';
 import { CodeEditor } from '../components/CodeEditor';
 import { CodePreview } from '../components/CodePreview';
-
-interface Ejercicio {
-  id: string;
-  titulo: Record<string, string>;
-  descripcion: Record<string, string>;
-  codigoInicio: string;
-  solucion: string;
-  pista: Record<string, string>;
-}
-
-const ejerciciosReact: Ejercicio[] = [
-  {
-    id: '1',
-    titulo: { es: 'useState básico', ca: 'useState bàsic', en: 'useState basic' },
-    descripcion: { es: 'Crea un contador que starts at 0 y aumenta en 1 al hacer click', ca: 'Crea un comptador que starts at 0 i augmenta en 1 al fer click', en: 'Create a counter that starts at 0 and increases by 1 on click' },
-    codigoInicio: `function Contador() {
-  // Tu código aquí
-}`,
-    solucion: `function Contador() {
-  const [count, setCount] = useState(0);
-  return <button onClick={() => setCount(count + 1)}>{count}</button>;
-}`,
-    pista: { es: 'Usa useState para crear el estado del contador', ca: 'Fes servir useState per crear lestat del comptador', en: 'Use useState to create the counter state' },
-  },
-  {
-    id: '2',
-    titulo: { es: 'useEffect simple', ca: 'useEffect simple', en: 'useEffect simple' },
-    descripcion: { es: 'Usa useEffect para mostrar un mensaje en consola cuando el componente se monta', ca: 'Fes servir useEffect per mostrar un missatge en consola quan el component es munta', en: 'Use useEffect to show a message in console when the component mounts' },
-    codigoInicio: `function MiComponente() {
-  // Tu código aquí
-  return <div>Mi Componente</div>;
-}`,
-    solucion: `function MiComponente() {
-  useEffect(() => {
-    console.log('Componente montado');
-  }, []);
-  return <div>Mi Componente</div>;
-}`,
-    pista: { es: 'Usa useEffect con un array de dependencias vacío', ca: 'Fes servir useEffect amb un array de dependències buit', en: 'Use useEffect with an empty dependencies array' },
-  },
-  {
-    id: '3',
-    titulo: { es: 'Importar componente', ca: 'Importar component', en: 'Import component' },
-    descripcion: { es: 'Importa el componente Button del archivo ./Button', ca: 'Importa el component Button del fitxer ./Button', en: 'Import the Button component from ./Button' },
-    codigoInicio: `// Tu código aquí
-
-function App() {
-  return <Button>Click me</Button>;
-}`,
-    solucion: `import { Button } from './Button';
-
-function App() {
-  return <Button>Click me</Button>;
-}`,
-    pista: { es: 'Usa import Named o default según cómo esté exportado', ca: 'Fes servir import Named o default segons com estigui exportat', en: 'Use Named or default import depending on how it is exported' },
-  },
-  {
-    id: '4',
-    titulo: { es: 'Props básicas', ca: 'Props bàsiques', en: 'Basic props' },
-    descripcion: { es: 'Crea un componente Saludo que reciba una prop "nombre" y muestre "Hola, {nombre}!"', ca: 'Crea un component Saludo que rebi una prop "nombre" i mostri "Hola, {nombre}!"', en: 'Create a Saludo component that receives a "name" prop and shows "Hola, {name}!"' },
-    codigoInicio: `// Tu código aquí
-
-function App() {
-  return <Saludo nombre="Juan" />;
-}`,
-    solucion: `function Saludo({ nombre }) {
-  return <h1>Hola, {nombre}!</h1>;
-}
-
-function App() {
-  return <Saludo nombre="Juan" />;
-}`,
-    pista: { es: 'Desestructura las props en los parámetros de la función', ca: 'Desestructura les props als paràmetres de la funció', en: 'Destructuring props in the function parameters' },
-  },
-  {
-    id: '5',
-    titulo: { es: 'Renderizado condicional', ca: 'Renderitzat condicional', en: 'Conditional rendering' },
-    descripcion: { es: 'Muestra "Cargando..." si isLoading es true, o el contenido si es false', ca: 'Mostra "Carregant..." si isLoading és true, o el contingut si és false', en: 'Show "Cargando..." if isLoading is true, or the content if false' },
-    codigoInicio: `function MiComponente({ isLoading, contenido }) {
-  // Tu código aquí
-}`,
-    solucion: `function MiComponente({ isLoading, contenido }) {
-  if (isLoading) return <p>Cargando...</p>;
-  return contenido;
-}`,
-    pista: { es: 'Usa un if o el operador ternario para conditionally render', ca: 'Fes servir un if o loperador ternari per renderitzar condicionalment', en: 'Use an if or ternary operator for conditional rendering' },
-  },
-];
+import { ejerciciosReact } from '../data/ejercicios';
 
 export default function EjerciciosPage() {
+  const searchParams = useSearchParams();
   const { isDark, t, language } = useTheme();
-  const [ejercicioActual, setEjercicioActual] = useState(ejerciciosReact[0]);
+  
+  const ejercicioId = searchParams.get('ejercicio');
+  const ejercicioInicial = ejerciciosReact.find(e => e.id === ejercicioId) || ejerciciosReact[0];
+  
+  const [ejercicioActual, setEjercicioActual] = useState(ejercicioInicial);
   const [ejerciciosEnviados, setEjerciciosEnviados] = useState<string[]>([]);
   const [seleccionados, setSeleccionados] = useState<string[]>([]);
+
+  useEffect(() => {
+    const ejercicio = ejerciciosReact.find(e => e.id === ejercicioId);
+    if (ejercicio) {
+      setEjercicioActual(ejercicio);
+    }
+  }, [ejercicioId]);
 
   const toggleEstudiante = (id: string) => {
     setSeleccionados(prev => 
