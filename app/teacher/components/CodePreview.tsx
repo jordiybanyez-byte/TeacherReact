@@ -38,23 +38,45 @@ export function CodePreview({ code, isDark = false }: CodePreviewProps) {
         <body>
           <div id="root"></div>
           <script type="text/babel">
-            const { useState, useEffect } = React;
+            const { useState, useEffect, useRef, useMemo, useCallback } = React;
             
             ${code}
             
             const root = ReactDOM.createRoot(document.getElementById('root'));
+            
+            // Detectar qué componente renderizar
             try {
-              root.render(<Contador />);
-            } catch (e) {
-              try {
-                root.render(<MiComponente />);
-              } catch (e2) {
-                try {
-                  root.render(<App />);
-                } catch (e3) {
-                  document.body.innerHTML = '<p style="color: #ef4444;">Error: ' + e3.message + '</p>';
+              // Buscar el nombre del componente en el código
+              const functionMatch = \`${code}\`.match(/function\\s+(\\w+)\\s*\\(/);
+              const constMatch = \`${code}\`.match(/const\\s+(\\w+)\\s*=\\s*(?:function|\\()/);
+              const arrowMatch = \`${code}\`.match(/const\\s+(\\w+)\\s*=\\s*\\(/);
+              
+              let componentName = null;
+              if (functionMatch) componentName = functionMatch[1];
+              else if (constMatch) componentName = constMatch[1];
+              else if (arrowMatch) componentName = arrowMatch[1];
+              
+              if (componentName && typeof eval(componentName) === 'function') {
+                root.render(React.createElement(eval(componentName)));
+              } else {
+                // Try common names
+                const commonNames = ['App', 'Contador', 'MiComponente', 'Saludo', 'HolaMundo', 'BotonMensaje', 'InputControlado'];
+                let rendered = false;
+                for (const name of commonNames) {
+                  try {
+                    if (typeof eval(name) === 'function') {
+                      root.render(React.createElement(eval(name)));
+                      rendered = true;
+                      break;
+                    }
+                  } catch (e) {}
+                }
+                if (!rendered) {
+                  root.render(React.createElement('div', null, 'No se pudo renderizar el componente'));
                 }
               }
+            } catch (e) {
+              root.render(React.createElement('div', { style: { color: '#ef4444' } }, 'Error: ' + e.message));
             }
           </script>
         </body>
