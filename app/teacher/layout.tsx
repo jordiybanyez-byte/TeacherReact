@@ -70,12 +70,6 @@ function LayoutContent({ children }: { children: ReactNode }) {
 }
 
 export default function TeacherLayout({ children }: { children: ReactNode }) {
-  useEffect(() => {
-    const saved = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const initial = saved || 'light';
-    document.documentElement.setAttribute('data-theme', initial);
-  }, []);
-
   return (
     <ThemeProvider>
       <LayoutContent>{children}</LayoutContent>

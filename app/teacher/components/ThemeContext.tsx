@@ -29,9 +29,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const theme = document.documentElement.getAttribute('data-theme');
-    setIsDark(theme === 'dark');
-
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    const initialTheme = savedTheme || 'light';
+    document.documentElement.setAttribute('data-theme', initialTheme);
+    setIsDark(initialTheme === 'dark');
+    
     const savedLang = localStorage.getItem('language') as Language | null;
     if (savedLang && (savedLang === 'es' || savedLang === 'ca' || savedLang === 'en')) {
       setLanguage(savedLang);
@@ -40,7 +42,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const toggleTheme = () => {
-    const newTheme = isDark ? 'light' : 'dark';
+    const newTheme = !isDark ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
     setIsDark(!isDark);

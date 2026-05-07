@@ -1,13 +1,24 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from './ThemeContext';
+import { useState } from 'react';
 
 interface SidebarProps {
   isDark: boolean;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+}
+
+interface MenuItem {
+  href?: string;
+  label: string;
+  icon: string;
+  isAccordion?: boolean;
+  isOpen?: boolean;
+  onToggle?: () => void;
+  children?: { href: string; label: string; icon: string }[];
 }
 
 function getIcon(icon: string, isActive: boolean, isDark: boolean) {
@@ -57,16 +68,34 @@ function getIcon(icon: string, isActive: boolean, isDark: boolean) {
 
 export function Sidebar({ isDark, isCollapsed, onToggleCollapse }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { t } = useTheme();
+  const [zonaLectivaOpen, setZonaLectivaOpen] = useState(true);
 
-  const menuItems = [
+  const isZonaLectivaActive = pathname.startsWith('/teacher/ejercicios');
+
+  const menuItems: MenuItem[] = [
     { href: '/teacher', label: t.inicio, icon: 'home' },
     { href: '/teacher/estudiantes', label: t.estudiantes, icon: 'users' },
-    { href: '/teacher/ejercicios', label: t.ejercicios, icon: 'clipboard' },
-    { href: '/teacher/ejercicios/lista', label: t.listaEjercicios || 'Lista de ejercicios', icon: 'clipboard' },
+    { 
+      label: t.zonaLectiva || 'Zona Lectiva', 
+      icon: 'book',
+      isAccordion: true,
+      isOpen: zonaLectivaOpen,
+      onToggle: () => {
+        setZonaLectivaOpen(!zonaLectivaOpen);
+        if (!zonaLectivaOpen && !isZonaLectivaActive) {
+          router.push('/teacher/ejercicios');
+        }
+      },
+      children: [
+        { href: '/teacher/ejercicios', label: t.ejercicios, icon: 'clipboard' },
+        { href: '/teacher/ejercicios/lista', label: t.listaEjercicios, icon: 'clipboard' },
+      ]
+    },
     { href: '/teacher/hackathon', label: t.hackathon, icon: 'code' },
     { href: '/teacher/cursos', label: t.cursos, icon: 'book' },
-    { href: '/teacher/invitar', label: t.invitarAlumnos, icon: 'mail' },
+    { href: '/teacher/invitar', label: t.invitarAlumnos || 'Invitar Alumnos', icon: 'mail' },
   ];
 
   return (
@@ -94,39 +123,89 @@ export function Sidebar({ isDark, isCollapsed, onToggleCollapse }: SidebarProps)
         </button>
       </div>
       
-      <nav className="flex-1 p-4">
+      <nav className="flex-1 p-4 overflow-y-auto">
         <ul className="space-y-2">
-          {menuItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`flex items-center gap-3 px-3 py-3 rounded-lg transition ${
-                    isActive
-                      ? (isDark ? 'bg-gray-700' : 'bg-gray-100')
-                      : (isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50')
-                  } ${isCollapsed ? 'justify-center' : ''}`}
-                >
-                  {getIcon(item.icon, isActive, isDark)}
-                  {!isCollapsed && (
-                    <span className={isDark ? 'text-white' : 'text-gray-700'}>
-                      {item.label}
-                    </span>
-                  )}
-                </Link>
-              </li>
-            );
+          {menuItems.map((item, index) => {
+            if (item.isAccordion) {
+              const isActive = item.isOpen || isZonaLectivaActive;
+              return (
+                <li key={`zona-lectiva-${index}`}>
+                  <button
+                    onClick={item.onToggle}
+                    className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition ${
+                      isActive
+                        ? (isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900')
+                        : (isDark ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-50 text-gray-700')
+                    } ${isCollapsed ? 'justify-center' : ''}`}
+                  >
+                    {getIcon(item.icon, isActive, isDark)}
+                    {!isCollapsed && (
+                      <>
+                        <span className="flex-1 text-left">{item.label}</span>
+                        <svg 
+                          className={`w-4 h-4 transition-transform ${item.isOpen ? 'rotate-90' : ''}`} 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </>
+                    )}
+                  </button>
+                  {item.isOpen && !isCollapsed && item.children?.map((child) => {
+                    const isChildActive = pathname === child.href;
+                    return (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        className={`flex items-center gap-3 px-3 py-3 ml-4 rounded-lg transition ${
+                          isChildActive
+                            ? (isDark ? 'bg-gray-700' : 'bg-gray-100')
+                            : (isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50')
+                        }`}
+                      >
+                        {getIcon(child.icon, isChildActive, isDark)}
+                        <span className={isDark ? 'text-white' : 'text-gray-700'}>
+                          {child.label}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </li>
+              );
+            } else {
+              const isActive = pathname === item.href;
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href!}
+                    className={`flex items-center gap-3 px-3 py-3 rounded-lg transition ${
+                      isActive
+                        ? (isDark ? 'bg-gray-700' : 'bg-gray-100')
+                        : (isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50')
+                    } ${isCollapsed ? 'justify-center' : ''}`}
+                  >
+                    {getIcon(item.icon, isActive, isDark)}
+                    {!isCollapsed && (
+                      <span className={isDark ? 'text-white' : 'text-gray-700'}>
+                        {item.label}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              );
+            }
           })}
         </ul>
       </nav>
       
-      <div className="p-4 border-t border-gray-700">
+      <div className={`p-4 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
         <button
           onClick={() => {
             localStorage.removeItem('theme');
             localStorage.removeItem('language');
-            window.location.href = '/login';
+            window.location.href = '/';
           }}
           className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition ${
             isDark ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-50 text-gray-500'
