@@ -12,7 +12,7 @@ interface InvitedStudent {
 }
 
 export default function InvitarPage() {
-  const { t, isDark, language } = useTheme();
+  const { t, language } = useTheme();
   const [email, setEmail] = useState('');
   const [students, setStudents] = useState<InvitedStudent[]>([]);
   const [message, setMessage] = useState('');
@@ -70,15 +70,15 @@ export default function InvitarPage() {
   };
 
   return (
-    <div className={`min-h-screen p-6 md:p-8 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <div className="min-h-screen p-6 md:p-8 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-5xl mx-auto">
-        <div className={`p-6 md:p-8 rounded-2xl ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
+        <div className="p-6 md:p-8 rounded-2xl bg-white dark:bg-gray-800 shadow-lg">
           <h1 className="text-3xl font-bold mb-2">{t.invitarAlumnos || 'Invitar Alumnos'}</h1>
-          <p className={`mb-8 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className="mb-8 text-gray-600 dark:text-gray-400">
             {t.invitarCorreo || 'Invitar por correo'}
           </p>
 
-          <div className={`p-6 rounded-xl ${isDark ? 'bg-gray-700' : 'bg-gray-50'} mb-8`}>
+          <div className="p-6 rounded-xl bg-gray-50 dark:bg-gray-700 mb-8">
             <form onSubmit={handleInvite} className="space-y-4">
               <div className="flex flex-col md:flex-row gap-3">
                 <input
@@ -86,20 +86,12 @@ export default function InvitarPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={t.emailAlumno || 'Email del alumno'}
-                  className={`flex-1 px-4 py-3 rounded-lg border ${
-                    isDark 
-                      ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400' 
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  className="flex-1 px-4 py-3 rounded-lg border bg-white border-gray-300 text-gray-900 placeholder-gray-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <select
                   value={selectedCourse}
                   onChange={(e) => setSelectedCourse(e.target.value)}
-                  className={`px-4 py-3 rounded-lg border ${
-                    isDark 
-                      ? 'bg-gray-800 border-gray-600 text-white' 
-                      : 'bg-white border-gray-300 text-gray-900'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[200px]`}
+                  className="px-4 py-3 rounded-lg border bg-white border-gray-300 text-gray-900 dark:bg-gray-800 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[200px]"
                 >
                   <option value="" disabled>
                     {language === 'es' ? 'Selecciona curso' : 
@@ -127,13 +119,13 @@ export default function InvitarPage() {
             </form>
           </div>
 
-          <div className={`mt-8 ${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl p-6`}>
-            <h2 className={`text-xl font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          <div className="mt-8 bg-white dark:bg-gray-800 rounded-xl p-6">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
               {t.listaAlumnos || 'Lista de alumnos'}
             </h2>
            
             {students.length === 0 ? (
-              <div className={`text-center py-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
@@ -146,15 +138,11 @@ export default function InvitarPage() {
                   return (
                     <div
                       key={student.id}
-                      className={`flex items-center justify-between p-4 rounded-lg ${
-                        isDark ? 'bg-gray-700' : 'bg-gray-50'
-                      }`}
+                      className="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-700"
                     >
                       <div className="flex items-center gap-3 flex-1">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          isDark ? 'bg-gray-600' : 'bg-gray-200'
-                        }`}>
-                          <svg className={`w-5 h-5 ${isDark ? 'text-gray-400' : 'text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-600">
+                          <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
                         </div>
@@ -169,7 +157,7 @@ export default function InvitarPage() {
                               {student.status === 'invited' ? (language === 'es' ? 'Invitado' : language === 'ca' ? 'Invitat' : 'Invited') : (language === 'es' ? 'Pendiente' : language === 'ca' ? 'Pendent' : 'Pending')}
                             </span>
                             {courseName && (
-                              <span className={`text-xs px-2 py-1 rounded-full ${isDark ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
+                              <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                                 {courseName}
                               </span>
                             )}

@@ -1,10 +1,10 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { estudiantes } from '../../data/estudiantes';
 import { ListaEstudiantes } from '../features/ListaEstudiantes';
 import { Estudiante } from '../../types/estudiante';
-import { ThemeToggle } from '../ui/ThemeToggle';
+import { ThemeProvider, useTheme } from '../context/ThemeProvider';
 
 function useEstadisticas(estudiantes: Estudiante[]) {
   return useMemo(() => {
@@ -38,24 +38,9 @@ function TarjetaEstadistica({
   );
 }
 
-export function VistaProfesor() {
+function VistaProfesorContent() {
   const estadisticas = useEstadisticas(estudiantes);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
-  useEffect(() => {
-    const saved = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const initial = saved || 'light';
-    document.documentElement.setAttribute('data-theme', initial);
-    setTheme(initial);
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    setTheme(newTheme);
-  };
-
+  const { toggleTheme, theme } = useTheme();
   const isDark = theme === 'dark';
 
   return (
@@ -96,5 +81,13 @@ export function VistaProfesor() {
         <ListaEstudiantes estudiantes={estudiantes} isDark={isDark} />
       </div>
     </div>
+  );
+}
+
+export function VistaProfesor() {
+  return (
+    <ThemeProvider>
+      <VistaProfesorContent />
+    </ThemeProvider>
   );
 }

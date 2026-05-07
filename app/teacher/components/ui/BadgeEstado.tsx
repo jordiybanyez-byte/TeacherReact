@@ -1,15 +1,14 @@
 import { Estado } from '../../types/estudiante';
-
+ 
 interface BadgeEstadoProps {
   estado: Estado;
-  isDark: boolean;
 }
 
-const colores: Record<Estado, { light: string; dark: string }> = {
-  activo: { light: 'bg-green-100 text-green-800 border-green-200', dark: 'bg-green-900 text-green-200 border-green-700' },
-  inactivo: { light: 'bg-gray-100 text-gray-600 border-gray-200', dark: 'bg-gray-700 text-gray-300 border-gray-600' },
-  completado: { light: 'bg-blue-100 text-blue-800 border-blue-200', dark: 'bg-blue-900 text-blue-200 border-blue-700' },
-  bloqueado: { light: 'bg-red-100 text-red-800 border-red-200', dark: 'bg-red-900 text-red-200 border-red-700' },
+const colores: Record<Estado, string> = {
+  activo: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700',
+  inactivo: 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600',
+  completado: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700',
+  bloqueado: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700',
 };
 
 const etiquetas: Record<Estado, string> = {
@@ -19,11 +18,9 @@ const etiquetas: Record<Estado, string> = {
   bloqueado: 'Bloqueado',
 };
 
-export function BadgeEstado({ estado, isDark }: BadgeEstadoProps) {
-  const claseColor = isDark ? colores[estado].dark : colores[estado].light;
-  
+export function BadgeEstado({ estado }: BadgeEstadoProps) {
   return (
-    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${claseColor}`}>
+    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${colores[estado]}`}>
       {etiquetas[estado]}
     </span>
   );

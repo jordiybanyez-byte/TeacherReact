@@ -1,10 +1,9 @@
 interface BuscadorProps {
   valor: string;
   onCambio: (valor: string) => void;
-  isDark: boolean;
 }
 
-export function Buscador({ valor, onCambio, isDark }: BuscadorProps) {
+export function Buscador({ valor, onCambio }: BuscadorProps) {
   return (
     <div className="relative">
       <svg
@@ -25,11 +24,7 @@ export function Buscador({ valor, onCambio, isDark }: BuscadorProps) {
         placeholder="Buscar por nombre o email..."
         value={valor}
         onChange={(e) => onCambio(e.target.value)}
-        className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
-          isDark 
-            ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400' 
-            : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400'
-        }`}
+        className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition bg-white text-gray-900 placeholder-gray-400 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
       />
     </div>
   );

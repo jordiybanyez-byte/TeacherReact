@@ -355,7 +355,7 @@ const ejerciciosData: Ejercicio[] = [
 ];
 
 export default function ListaEjerciciosPage() {
-  const { isDark, language, t } = useTheme();
+  const { language, t } = useTheme();
   const [filtroNivel, setFiltroNivel] = useState<string>('todos');
   const [openConcepts, setOpenConcepts] = useState<Record<string, boolean>>({});
 
@@ -371,10 +371,10 @@ export default function ListaEjerciciosPage() {
 
   const getNivelColor = (nivel: string) => {
     switch (nivel) {
-      case 'básico': return isDark ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800';
-      case 'intermedio': return isDark ? 'bg-yellow-900 text-yellow-200' : 'bg-yellow-100 text-yellow-800';
-      case 'avanzado': return isDark ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-800';
-      default: return isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800';
+      case 'básico': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'intermedio': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'avanzado': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
     }
   };
 
@@ -395,10 +395,10 @@ export default function ListaEjerciciosPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           {t.listaEjercicios || 'Lista de Ejercicios'}
         </h1>
-        <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
+        <p className="text-gray-600 dark:text-gray-400">
           {language === 'es' ? 'Todos los ejercicios disponibles' : language === 'ca' ? 'Tots els exercicis disponibles' : 'All available exercises'}
         </p>
       </div>
@@ -411,7 +411,7 @@ export default function ListaEjerciciosPage() {
             className={`px-4 py-2 rounded-lg capitalize transition ${
               filtroNivel === nivel
                 ? 'bg-blue-600 text-white'
-                : isDark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
             }`}
           >
             {nivel}
@@ -434,26 +434,26 @@ export default function ListaEjerciciosPage() {
           return (
             <div 
               key={concepto}
-              className={`border rounded-xl overflow-hidden ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              className="border rounded-xl overflow-hidden bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700"
             >
               <button
                 onClick={() => toggleConcept(concepto)}
                 className={`w-full flex items-center justify-between p-4 transition ${
                   isOpen 
-                    ? (isDark ? 'bg-gray-700' : 'bg-gray-50') 
-                    : (isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50')
+                    ? 'bg-gray-50 dark:bg-gray-700' 
+                    : 'hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   {getConceptIcon(concepto)}
-                  <span className={`font-semibold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                   <span className="font-semibold text-lg text-gray-900 dark:text-white">
                     {concepto}
                   </span>
-                  <span className={`text-sm px-2 py-1 rounded-full ${isDark ? 'bg-gray-600 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
+                   <span className="text-sm px-2 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300">
                     {ejerciciosDelConcepto.length} {language === 'es' ? 'ejercicios' : language === 'ca' ? 'exercicis' : 'exercises'}
                   </span>
                 </div>
-                <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                         <span className="text-sm text-gray-500 dark:text-gray-400">
                   {isOpen ? (language === 'es' ? 'Cerrar' : language === 'ca' ? 'Tancar' : 'Close') : (language === 'es' ? 'Abrir' : language === 'ca' ? 'Obrir' : 'Open')}
                 </span>
               </button>
@@ -467,22 +467,22 @@ export default function ListaEjerciciosPage() {
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-1">
-                          <span className={`text-sm font-mono ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                           <span className="text-sm font-mono text-gray-500 dark:text-gray-400">
                             #{ejercicio.id}
                           </span>
-                          <h3 className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                           <h3 className="font-medium text-gray-900 dark:text-white">
                             {ejercicio.titulo[language]}
                           </h3>
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getNivelColor(ejercicio.nivel)}`}>
                             {ejercicio.nivel}
                           </span>
                         </div>
-                        <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} ml-8`}>
+                         <p className="text-sm text-gray-600 dark:text-gray-400 ml-8">
                           {ejercicio.descripcion[language]}
                         </p>
                       </div>
                       <div className="flex items-center gap-3 ml-4">
-                        <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
                           ⏱ {ejercicio.tiempo}
                         </span>
                         <button
@@ -501,7 +501,7 @@ export default function ListaEjerciciosPage() {
         })}
       </div>
 
-      <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+       <div className="text-sm text-gray-500 dark:text-gray-400">
         {language === 'es' ? `Mostrando ejercicios de ${Object.keys(openConcepts).filter(k => openConcepts[k]).length} conceptos` : 
          language === 'ca' ? `Mostrant exercicis de ${Object.keys(openConcepts).filter(k => openConcepts[k]).length} conceptes` :
          `Showing exercises from ${Object.keys(openConcepts).filter(k => openConcepts[k]).length} concepts`}

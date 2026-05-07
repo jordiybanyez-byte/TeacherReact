@@ -9,10 +9,9 @@ import { TablaEstudiantes } from './TablaEstudiantes';
 
 interface ListaEstudiantesProps {
   estudiantes: Estudiante[];
-  isDark: boolean;
 }
 
-export function ListaEstudiantes({ estudiantes, isDark }: ListaEstudiantesProps) {
+export function ListaEstudiantes({ estudiantes }: ListaEstudiantesProps) {
   const [filtros, setFiltros] = useState<Filtros>({
     buscar: '',
     estado: 'todos',
@@ -61,27 +60,25 @@ export function ListaEstudiantes({ estudiantes, isDark }: ListaEstudiantesProps)
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
-          <Buscador valor={filtros.buscar} onCambio={(v) => actualizarFiltro('buscar', v)} isDark={isDark} />
+          <Buscador valor={filtros.buscar} onCambio={(v) => actualizarFiltro('buscar', v)} />
         </div>
         <div className="flex gap-2">
           <FiltroEstado
             valor={filtros.estado}
             onCambio={(v) => actualizarFiltro('estado', v)}
-            isDark={isDark}
           />
           <Ordenacion
             valor={filtros.orden}
             onCambio={(v) => actualizarFiltro('orden', v)}
-            isDark={isDark}
           />
         </div>
       </div>
 
-      <div className={`rounded-xl shadow-sm border overflow-hidden ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-gray-100 border-gray-200'}`}>
-        <TablaEstudiantes estudiantes={estudiantesFiltrados} isDark={isDark} />
+      <div className="rounded-xl shadow-sm border overflow-hidden bg-gray-100 border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <TablaEstudiantes estudiantes={estudiantesFiltrados} />
       </div>
 
-      <p className={`text-sm text-right ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+      <p className="text-sm text-right text-gray-500 dark:text-gray-400">
         Mostrando {estudiantesFiltrados.length} de {estudiantes.length} estudiantes
       </p>
     </div>

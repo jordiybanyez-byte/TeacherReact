@@ -1,19 +1,24 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface CodePreviewProps {
   code: string;
-  isDark?: boolean;
 }
 
-export function CodePreview({ code, isDark = false }: CodePreviewProps) {
+export function CodePreview({ code }: CodePreviewProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [error, setError] = useState<string | null>(null);
+  const urlRef = useRef<string | null>(null);
 
-  useEffect(() => {
+  const updateIframe = (code: string) => {
     if (!iframeRef.current) return;
 
+    if (urlRef.current) {
+      URL.revokeObjectURL(urlRef.current);
+    }
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const isDark = currentTheme === 'dark';
     const backgroundColor = isDark ? '#111827' : '#ffffff';
     const textColor = isDark ? '#f9fafb' : '#171717';
 
@@ -44,9 +49,7 @@ export function CodePreview({ code, isDark = false }: CodePreviewProps) {
             
             const root = ReactDOM.createRoot(document.getElementById('root'));
             
-            // Detectar qué componente renderizar
             try {
-              // Buscar el nombre del componente en el código
               const functionMatch = \`${code}\`.match(/function\\s+(\\w+)\\s*\\(/);
               const constMatch = \`${code}\`.match(/const\\s+(\\w+)\\s*=\\s*(?:function|\\()/);
               const arrowMatch = \`${code}\`.match(/const\\s+(\\w+)\\s*=\\s*\\(/);
@@ -59,7 +62,6 @@ export function CodePreview({ code, isDark = false }: CodePreviewProps) {
               if (componentName && typeof eval(componentName) === 'function') {
                 root.render(React.createElement(eval(componentName)));
               } else {
-                // Try common names
                 const commonNames = ['App', 'Contador', 'MiComponente', 'Saludo', 'HolaMundo', 'BotonMensaje', 'InputControlado'];
                 let rendered = false;
                 for (const name of commonNames) {
@@ -85,20 +87,36 @@ export function CodePreview({ code, isDark = false }: CodePreviewProps) {
 
     const blob = new Blob([htmlContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
+    urlRef.current = url;
     
     iframeRef.current.src = url;
+  };
 
-    return () => URL.revokeObjectURL(url);
-  }, [code, isDark]);
+  useEffect(() => {
+    updateIframe(code);
+
+    const observer = new MutationObserver(() => {
+      updateIframe(code);
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+
+    return () => {
+      observer.disconnect();
+      if (urlRef.current) {
+        URL.revokeObjectURL(urlRef.current);
+      }
+    };
+  }, [code]);
 
   return (
     <div className="mt-4">
-      <p className={`text-sm font-medium mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+      <p className="text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">
         Preview:
       </p>
       <iframe
         ref={iframeRef}
-        className={`w-full h-48 rounded-lg border ${isDark ? 'border-gray-600' : 'border-gray-300'}`}
+        className="w-full h-48 rounded-lg border border-gray-300 dark:border-gray-600"
         sandbox="allow-scripts allow-same-origin"
         title="Code Preview"
       />

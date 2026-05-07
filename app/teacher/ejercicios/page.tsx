@@ -10,7 +10,7 @@ import { ejerciciosReact } from '../data/ejercicios';
 
 function EjerciciosContent() {
   const searchParams = useSearchParams();
-  const { isDark, t, language } = useTheme();
+  const { t, language } = useTheme();
   
   const ejercicioId = searchParams.get('ejercicio');
   const ejercicioInicial = ejerciciosReact.find(e => e.id === ejercicioId) || ejerciciosReact[0];
@@ -18,13 +18,6 @@ function EjerciciosContent() {
   const [ejercicioActual, setEjercicioActual] = useState(ejercicioInicial);
   const [ejerciciosEnviados, setEjerciciosEnviados] = useState<string[]>([]);
   const [seleccionados, setSeleccionados] = useState<string[]>([]);
-
-  useEffect(() => {
-    const ejercicio = ejerciciosReact.find(e => e.id === ejercicioId);
-    if (ejercicio) {
-      setEjercicioActual(ejercicio);
-    }
-  }, [ejercicioId]);
 
   const toggleEstudiante = (id: string) => {
     setSeleccionados(prev => 
@@ -53,18 +46,18 @@ function EjerciciosContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           {t.ejerciciosReact}
         </h1>
-        <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
+        <p className="text-gray-600 dark:text-gray-400">
           {t.ejerciciosCortos}
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className={`p-6 rounded-xl border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <div className="p-6 rounded-xl border bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700">
           <div className="flex justify-between items-center mb-4">
-            <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               {ejercicioActual.titulo[language]}
             </h2>
             <button
@@ -75,48 +68,42 @@ function EjerciciosContent() {
             </button>
           </div>
           
-          <p className={`mb-4 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+           <p className="mb-4 text-gray-700 dark:text-gray-300">
             {ejercicioActual.descripcion[language]}
           </p>
 
           <div className="mb-4">
-            <p className={`text-sm font-medium mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-              {language === 'es' ? 'Código:' : language === 'ca' ? 'Codi:' : 'Code:'}
+             <p className="text-sm font-medium mb-2 text-gray-500 dark:text-gray-400">
+              {language === 'es' ? 'Código inicial:' : language === 'ca' ? 'Codi inicial:' : 'Initial code:'}
             </p>
-            <CodeEditor initialCode={ejercicioActual.codigoInicio} isDark={isDark} />
+             <CodeEditor initialCode={ejercicioActual.codigoInicio} />
           </div>
 
-          <details className={`p-4 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
-            <summary className={`cursor-pointer font-medium ${isDark ? 'text-yellow-400' : 'text-yellow-600'}`}>
-              {t.verPista}
-            </summary>
-            <p className={`mt-2 text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-              {ejercicioActual.pista[language]}
-            </p>
-          </details>
+           <details className="p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
+             <summary className="cursor-pointer font-medium text-yellow-600 dark:text-yellow-400">
+               {t.verPista}
+             </summary>
+             <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+               {ejercicioActual.pista[language]}
+             </p>
+           </details>
 
-          <details className={`mt-4 p-4 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
-            <summary className={`cursor-pointer font-medium ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
-              {t.verSolucion}
-            </summary>
-            <pre className={`mt-2 p-4 rounded-lg overflow-x-auto text-sm font-mono ${isDark ? 'bg-gray-900 text-green-400' : 'bg-gray-100 text-green-700'}`}>
-              {ejercicioActual.solucion}
-            </pre>
-            <div className="mt-4">
-              <p className={`text-sm font-medium mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                {language === 'es' ? 'Preview solución:' : language === 'ca' ? 'Preview solució:' : 'Solution preview:'}
-              </p>
-              <CodePreview code={ejercicioActual.solucion} isDark={isDark} />
-            </div>
-          </details>
+           <details className="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
+             <summary className="cursor-pointer font-medium text-blue-600 dark:text-blue-400">
+               {t.verSolucion}
+             </summary>
+             <pre className="mt-2 p-4 rounded-lg overflow-x-auto text-sm font-mono bg-gray-100 text-green-700 dark:bg-gray-900 dark:text-green-400">
+               {ejercicioActual.solucion}
+             </pre>
+           </details>
         </div>
 
-        <div className={`p-6 rounded-xl border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-          <h2 className={`text-xl font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+        <div className="p-6 rounded-xl border bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
             {t.enviarAEstudiantes}
           </h2>
           
-          <p className={`mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+           <p className="mb-4 text-gray-600 dark:text-gray-400">
             {t.seleccionarEstudiantes}
           </p>
 
@@ -126,8 +113,8 @@ function EjerciciosContent() {
                 key={estudiante.id}
                 className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition ${
                   seleccionados.includes(estudiante.id)
-                    ? isDark ? 'bg-blue-900 border-blue-700' : 'bg-blue-50 border-blue-200'
-                    : isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
+                    ? 'bg-blue-50 border-blue-200 dark:bg-blue-900 dark:border-blue-700'
+                    : 'bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600'
                 } border ${seleccionados.includes(estudiante.id) ? 'border-blue-500' : 'border-transparent'}`}
               >
                 <input
@@ -136,11 +123,11 @@ function EjerciciosContent() {
                   onChange={() => toggleEstudiante(estudiante.id)}
                   className="w-4 h-4"
                 />
-                <span className={isDark ? 'text-white' : 'text-gray-900'}>
+                <span className="text-gray-900 dark:text-white">
                   {estudiante.nombre}
                 </span>
                 {ejerciciosEnviados.includes(ejercicioActual.id) && (
-                  <span className={`ml-auto text-xs px-2 py-1 rounded ${isDark ? 'bg-green-800 text-green-200' : 'bg-green-100 text-green-700'}`}>
+                  <span className="ml-auto text-xs px-2 py-1 rounded bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200">
                     {t.ejercicioEnviado}
                   </span>
                 )}
@@ -154,7 +141,7 @@ function EjerciciosContent() {
             className={`w-full py-3 px-4 rounded-lg font-medium transition ${
               seleccionados.length > 0
                 ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : isDark ? 'bg-gray-700 text-gray-500' : 'bg-gray-200 text-gray-500'
+                : 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
             }`}
           >
             {t.enviarEjercicio} ({seleccionados.length} {t.seleccionados})
@@ -162,5 +149,13 @@ function EjerciciosContent() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function EjerciciosPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white dark:bg-gray-900" />}>
+      <EjerciciosContent />
+    </Suspense>
   );
 }

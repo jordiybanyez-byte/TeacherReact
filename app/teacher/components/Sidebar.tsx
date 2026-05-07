@@ -2,11 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useTheme } from './ThemeContext';
 import { useState } from 'react';
+import { useTheme } from './ThemeContext';
 
 interface SidebarProps {
-  isDark: boolean;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
 }
@@ -21,8 +20,8 @@ interface MenuItem {
   children?: { href: string; label: string; icon: string }[];
 }
 
-function getIcon(icon: string, isActive: boolean, isDark: boolean) {
-  const color = isActive ? (isDark ? 'text-blue-400' : 'text-blue-600') : (isDark ? 'text-gray-400' : 'text-gray-500');
+function getIcon(icon: string, isActive: boolean) {
+  const color = isActive ? 'text-blue-400' : 'text-gray-500 dark:text-gray-400';
   
   switch (icon) {
     case 'home':
@@ -66,15 +65,20 @@ function getIcon(icon: string, isActive: boolean, isDark: boolean) {
   }
 }
 
-export function Sidebar({ isDark, isCollapsed, onToggleCollapse }: SidebarProps) {
+export function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { t } = useTheme();
   const [zonaLectivaOpen, setZonaLectivaOpen] = useState(true);
 
-  const isZonaLectivaActive = pathname.startsWith('/teacher/ejercicios');
+  const toggleZonaLectiva = () => {
+    setZonaLectivaOpen(!zonaLectivaOpen);
+    if (!zonaLectivaOpen && !pathname.startsWith('/teacher/ejercicios')) {
+      router.push('/teacher/ejercicios');
+    }
+  };
 
-  const menuItems: MenuItem[] = [
+  const menuItems = [
     { href: '/teacher', label: t.inicio, icon: 'home' },
     { href: '/teacher/estudiantes', label: t.estudiantes, icon: 'users' },
     { 
@@ -82,12 +86,7 @@ export function Sidebar({ isDark, isCollapsed, onToggleCollapse }: SidebarProps)
       icon: 'book',
       isAccordion: true,
       isOpen: zonaLectivaOpen,
-      onToggle: () => {
-        setZonaLectivaOpen(!zonaLectivaOpen);
-        if (!zonaLectivaOpen && !isZonaLectivaActive) {
-          router.push('/teacher/ejercicios');
-        }
-      },
+      onToggle: toggleZonaLectiva,
       children: [
         { href: '/teacher/ejercicios', label: t.ejercicios, icon: 'clipboard' },
         { href: '/teacher/ejercicios/lista', label: t.listaEjercicios, icon: 'clipboard' },
@@ -99,15 +98,15 @@ export function Sidebar({ isDark, isCollapsed, onToggleCollapse }: SidebarProps)
   ];
 
   return (
-    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} min-h-screen border-r transition-all duration-300 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} flex flex-col`}>
-      <div className={`flex items-center justify-between p-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} min-h-screen border-r transition-all duration-300 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 flex flex-col`}>
+      <div className={`flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700`}>
         {!isCollapsed && (
           <>
             <div>
-              <h1 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
                 {t.teacherHub}
               </h1>
-              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 {t.moocReact}
               </p>
             </div>
@@ -115,7 +114,7 @@ export function Sidebar({ isDark, isCollapsed, onToggleCollapse }: SidebarProps)
         )}
         <button
           onClick={onToggleCollapse}
-          className={`p-2 rounded-lg transition ${isDark ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400"
         >
           <svg className="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transform: isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)' }}>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
@@ -127,23 +126,23 @@ export function Sidebar({ isDark, isCollapsed, onToggleCollapse }: SidebarProps)
         <ul className="space-y-2">
           {menuItems.map((item, index) => {
             if (item.isAccordion) {
-              const isActive = item.isOpen || isZonaLectivaActive;
+              const isActive = item.isOpen || pathname.startsWith('/teacher/ejercicios');
               return (
                 <li key={`zona-lectiva-${index}`}>
                   <button
                     onClick={item.onToggle}
                     className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition ${
                       isActive
-                        ? (isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900')
-                        : (isDark ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-50 text-gray-700')
+                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
+                        : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-400'
                     } ${isCollapsed ? 'justify-center' : ''}`}
                   >
-                    {getIcon(item.icon, isActive, isDark)}
+                    {getIcon(item.icon, isActive)}
                     {!isCollapsed && (
                       <>
                         <span className="flex-1 text-left">{item.label}</span>
                         <svg 
-                          className={`w-4 h-4 transition-transform ${item.isOpen ? 'rotate-90' : ''}`} 
+                          className={`w-4 h-4 transition-transform ${item.isOpen ? 'rotate-90' : ''}`}
                           fill="none" 
                           stroke="currentColor" 
                           viewBox="0 0 24 24"
@@ -161,12 +160,12 @@ export function Sidebar({ isDark, isCollapsed, onToggleCollapse }: SidebarProps)
                         href={child.href}
                         className={`flex items-center gap-3 px-3 py-3 ml-4 rounded-lg transition ${
                           isChildActive
-                            ? (isDark ? 'bg-gray-700' : 'bg-gray-100')
-                            : (isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50')
+                            ? 'bg-gray-100 dark:bg-gray-700'
+                            : 'hover:bg-gray-50 dark:hover:bg-gray-700'
                         }`}
                       >
-                        {getIcon(child.icon, isChildActive, isDark)}
-                        <span className={isDark ? 'text-white' : 'text-gray-700'}>
+                        {getIcon(child.icon, isChildActive)}
+                        <span className="text-gray-900 dark:text-white">
                           {child.label}
                         </span>
                       </Link>
@@ -182,13 +181,13 @@ export function Sidebar({ isDark, isCollapsed, onToggleCollapse }: SidebarProps)
                     href={item.href!}
                     className={`flex items-center gap-3 px-3 py-3 rounded-lg transition ${
                       isActive
-                        ? (isDark ? 'bg-gray-700' : 'bg-gray-100')
-                        : (isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50')
+                        ? 'bg-gray-100 dark:bg-gray-700'
+                        : 'hover:bg-gray-50 dark:hover:bg-gray-700'
                     } ${isCollapsed ? 'justify-center' : ''}`}
                   >
-                    {getIcon(item.icon, isActive, isDark)}
+                    {getIcon(item.icon, isActive)}
                     {!isCollapsed && (
-                      <span className={isDark ? 'text-white' : 'text-gray-700'}>
+                      <span className="text-gray-900 dark:text-white">
                         {item.label}
                       </span>
                     )}
@@ -200,22 +199,20 @@ export function Sidebar({ isDark, isCollapsed, onToggleCollapse }: SidebarProps)
         </ul>
       </nav>
       
-      <div className={`p-4 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
         <button
           onClick={() => {
             localStorage.removeItem('theme');
             localStorage.removeItem('language');
             window.location.href = '/';
           }}
-          className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition ${
-            isDark ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-50 text-gray-500'
-          } ${isCollapsed ? 'justify-center' : ''}`}
+          className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 ${isCollapsed ? 'justify-center' : ''}`}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
           {!isCollapsed && (
-            <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>
+            <span className="text-gray-500 dark:text-gray-400">
               {t.cerrarSesion || 'Cerrar sesión'}
             </span>
           )}
