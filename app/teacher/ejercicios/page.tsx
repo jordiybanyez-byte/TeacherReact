@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTheme } from '../components/ThemeContext';
 import { estudiantes } from '../data/estudiantes';
@@ -8,7 +8,7 @@ import { CodeEditor } from '../components/CodeEditor';
 import { CodePreview } from '../components/CodePreview';
 import { ejerciciosReact } from '../data/ejercicios';
 
-export default function EjerciciosPage() {
+function EjerciciosContent() {
   const searchParams = useSearchParams();
   const { isDark, t, language } = useTheme();
   

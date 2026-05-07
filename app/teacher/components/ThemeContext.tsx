@@ -25,49 +25,41 @@ export function useTheme() {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [isDark, setIsDark] = useState(false);
-  const [language, setLanguage] = useState<Language>('es');
-  const [mounted, setMounted] = useState(false);
+  const [language, setLanguageState] = useState<Language>('es');
 
   useEffect(() => {
+    // Leer tema inicial
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
     const initialTheme = savedTheme || 'light';
     document.documentElement.setAttribute('data-theme', initialTheme);
     setIsDark(initialTheme === 'dark');
     
+    // Leer idioma inicial
     const savedLang = localStorage.getItem('language') as Language | null;
     if (savedLang && (savedLang === 'es' || savedLang === 'ca' || savedLang === 'en')) {
-      setLanguage(savedLang);
+      setLanguageState(savedLang);
     }
-    setMounted(true);
   }, []);
 
   const toggleTheme = () => {
-    const newTheme = !isDark ? 'dark' : 'light';
+    const newTheme = isDark ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
     setIsDark(!isDark);
   };
 
-  const handleSetLanguage = (lang: Language) => {
-    setLanguage(lang);
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
     localStorage.setItem('language', lang);
   };
 
-  const value = { 
-    isDark, 
-    toggleTheme, 
-    language, 
-    setLanguage: handleSetLanguage,
+  const value = {
+    isDark,
+    toggleTheme,
+    language,
+    setLanguage,
     t: translations[language],
   };
-
-  if (!mounted) {
-    return (
-      <ThemeContext.Provider value={value}>
-        <div className="min-h-screen bg-white dark:bg-gray-900" />
-      </ThemeContext.Provider>
-    );
-  }
 
   return (
     <ThemeContext.Provider value={value}>

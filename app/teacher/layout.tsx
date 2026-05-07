@@ -28,7 +28,7 @@ function ThemeToggle() {
 }
 
 function LanguageToggle() {
-  const { isDark, language, setLanguage, t } = useTheme();
+  const { language, setLanguage, t, isDark } = useTheme();
 
   return (
     <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-700">
@@ -54,10 +54,10 @@ function LayoutContent({ children }: { children: ReactNode }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className={`flex min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       <Sidebar isDark={isDark} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
       <main className="flex-1 flex flex-col transition-all duration-300">
-        <header className={`h-16 border-b flex items-center justify-end gap-3 px-6 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <header className={`h-16 border-b flex items-center justify-end gap-3 px-6 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700`}>
           <LanguageToggle />
           <ThemeToggle />
         </header>
