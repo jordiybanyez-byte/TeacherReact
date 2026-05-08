@@ -1,136 +1,175 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { estudiantes } from '../data/estudiantes';
-import { cursos } from '../data/cursos';
-import { useTheme } from '../components/ThemeContext';
 import { ListaEstudiantes } from '../components/features/ListaEstudiantes';
+import { useTheme } from '../components/ThemeContext';
+
+interface Curso {
+  id: string;
+  titulo: string;
+  estado: 'activo' | 'inactivo' | 'borrador';
+}
+
+const cursos: Curso[] = [
+  { id: '1', titulo: 'React para Principiantes', estado: 'activo' },
+  { id: '2', titulo: 'Advanced React Patterns', estado: 'activo' },
+  { id: '3', titulo: 'React Hooks Deep Dive', estado: 'borrador' },
+];
 
 export default function EstudiantesPage() {
-  const { t } = useTheme();
+  const { isDark, t, language } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [openCourses, setOpenCourses] = useState<Record<string, boolean>>({});
+  const [cursoSeleccionado, setCursoSeleccionado] = useState<string | null>(null);
 
   useState(() => {
     setMounted(true);
   });
 
-  const toggleCourse = (courseId: string) => {
-    setOpenCourses(prev => ({
-      ...prev,
-      [courseId]: !prev[courseId]
-    }));
+  const estudiantesFiltrados = useMemo(() => {
+    if (!cursoSeleccionado) return estudiantes;
+    return estudiantes.filter(e => e.cursoId === cursoSeleccionado);
+  }, [cursoSeleccionado]);
+
+  const estadisticas = {
+    total: estudiantesFiltrados.length,
+    activos: estudiantesFiltrados.filter(e => e.estado === 'activo').length,
+    completados: estudiantesFiltrados.filter(e => e.estado === 'completado').length,
+    promedioProgreso: estudiantesFiltrados.length > 0 
+      ? Math.round(estudiantesFiltrados.reduce((acc, e) => acc + e.progreso, 0) / estudiantesFiltrados.length)
+      : 0,
   };
 
-  const getCourseStats = (courseId: string) => {
-    const estudiantesDelCurso = estudiantes.filter(e => {
-      // Asumimos que el estudiante tiene un campo cursoId o lo asignamos por el nombre
-      // Por ahora filtramos por los primeros 8 estudiantes para el curso 1, etc.
-      const courseIndex = cursos.findIndex(c => c.id === courseId);
-      const startIndex = courseIndex * 8;
-      return estudiantes.indexOf(e) >= startIndex && estudiantes.indexOf(e) < startIndex + 8;
+  const getCursoNombre = (cursoId: string) => {
+    const curso = cursos.find(c => c.id === cursoId);
+    return curso ? curso.titulo : 'Sin curso';
+  };
+
+  const estudiantesPorCurso = useMemo(() => {
+    const grupos: Record<string, typeof estudiantes> = {};
+    estudiantes.forEach(e => {
+      const key = e.cursoId || 'sin-curso';
+      if (!grupos[key]) grupos[key] = [];
+      grupos[key].push(e);
     });
+    return grupos;
+  }, []);
 
-    return {
-      total: estudiantesDelCurso.length,
-      activos: estudiantesDelCurso.filter(e => e.estado === 'activo').length,
-      promedio: Math.round(estudiantesDelCurso.reduce((acc, e) => acc + e.progreso, 0) / (estudiantesDelCurso.length || 1)),
-    };
-  };
+  const [cursoAbierto, setCursoAbierto] = useState<string | null>(null);
 
-  const getEstudiantesByCourse = (courseId: string) => {
-    const courseIndex = cursos.findIndex(c => c.id === courseId);
-    const startIndex = courseIndex * 8;
-    return estudiantes.slice(startIndex, startIndex + 8);
+  const toggleCurso = (cursoId: string) => {
+    setCursoAbierto(cursoAbierto === cursoId ? null : cursoId);
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          {t.gestionEstudiantes || 'Gestión de Estudiantes'}
+        <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          {t.gestionEstudiantes}
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          {t.administrarEstudiantes || 'Administra los estudiantes del curso'}
+        <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
+          {t.administrarEstudiantes}
         </p>
       </div>
 
-      <div className="space-y-4">
-        {cursos.filter(c => c.estado === 'activo').map((curso) => {
-          const isOpen = openCourses[curso.id];
-          const stats = getCourseStats(curso.id);
-          const estudiantesDelCurso = getEstudiantesByCourse(curso.id);
+      <div className="flex gap-4 items-center flex-wrap">
+        <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+          {language === 'es' ? 'Filtrar por curso:' : language === 'ca' ? 'Filtrar per curs:' : 'Filter by course:'}
+        </span>
+        <button
+          onClick={() => setCursoSeleccionado(null)}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+            cursoSeleccionado === null
+              ? 'bg-blue-600 text-white'
+              : isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          {language === 'es' ? 'Todos' : language === 'ca' ? 'Tots' : 'All'}
+        </button>
+        {cursos.map(curso => (
+          <button
+            key={curso.id}
+            onClick={() => setCursoSeleccionado(curso.id)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+              cursoSeleccionado === curso.id
+                ? 'bg-blue-600 text-white'
+                : isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {curso.titulo}
+          </button>
+        ))}
+      </div>
 
-          return (
-            <div 
-              key={curso.id}
-              className="border rounded-xl overflow-hidden bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className={`rounded-xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t.total}</p>
+          <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{estadisticas.total}</p>
+        </div>
+        <div className={`rounded-xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t.activos}</p>
+          <p className={`text-2xl font-bold ${isDark ? 'text-green-400' : 'text-green-600'}`}>{estadisticas.activos}</p>
+        </div>
+        <div className={`rounded-xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t.completados}</p>
+          <p className={`text-2xl font-bold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>{estadisticas.completados}</p>
+        </div>
+        <div className={`rounded-xl p-6 shadow-sm border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t.progresoPromedio}</p>
+          <p className={`text-2xl font-bold ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>{estadisticas.promedioProgreso}%</p>
+        </div>
+      </div>
+
+      {cursoSeleccionado === null ? (
+        <div className="space-y-4">
+          {Object.entries(estudiantesPorCurso).map(([cursoId, estudiantesCurso]) => (
+            <div
+              key={cursoId}
+              className={`rounded-lg border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
             >
               <button
-                onClick={() => toggleCourse(curso.id)}
-                className={`w-full flex items-center justify-between p-6 transition ${
-                  isOpen 
-                    ? 'bg-gray-50 dark:bg-gray-700' 
-                    : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                onClick={() => toggleCurso(cursoId)}
+                className={`w-full p-4 flex items-center justify-between hover:bg-opacity-50 transition ${
+                  isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
                 }`}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                    isDark ? 'bg-blue-900 text-blue-300' : 'bg-blue-100 text-blue-700'
+                  }`}>
+                    {estudiantesCurso.length}
                   </div>
-                    <div className="text-left">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {curso.nombre}
-                      </h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {curso.descripcion}
-                      </p>
-                    </div>
+                  <div className="text-left">
+                    <h2 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                      {getCursoNombre(cursoId)}
+                    </h2>
+                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                      {estudiantesCurso.length} {language === 'es' ? 'estudiantes' : language === 'ca' ? 'estudiants' : 'students'}
+                    </p>
+                  </div>
                 </div>
-
-                <div className="flex items-center gap-6">
-                    <div className="hidden md:flex gap-6 text-sm">
-                      <div className="text-center">
-                        <p className="font-bold text-gray-900 dark:text-white">{stats.total}</p>
-                        <p className="text-gray-500 dark:text-gray-400">{t.total || 'Total'}</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="font-bold text-green-600 dark:text-green-400">{stats.activos}</p>
-                        <p className="text-gray-500 dark:text-gray-400">{t.activos || 'Activos'}</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="font-bold text-purple-600 dark:text-purple-400">{stats.promedio}%</p>
-                        <p className="text-gray-500 dark:text-gray-400">{t.progresoPromedio || 'Promedio'}</p>
-                      </div>
-                    </div>
-
-                  <svg 
-                    className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-90' : ''}`}
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
+                <svg
+                  className={`w-5 h-5 transition-transform ${isDark ? 'text-gray-400' : 'text-gray-600'} ${
+                    cursoAbierto === cursoId ? 'rotate-180' : ''
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </button>
 
-              {isOpen && (
-                <div className="p-6 border-t border-gray-200 dark:border-gray-700">
-                  <ListaEstudiantes estudiantes={estudiantesDelCurso} />
+              {cursoAbierto === cursoId && (
+                <div className={`border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} p-4`}>
+                  <ListaEstudiantes estudiantes={estudiantesCurso} isDark={isDark} />
                 </div>
               )}
             </div>
-          );
-        })}
-      </div>
-
-      {mounted && cursos.filter(c => c.estado === 'activo').length === 0 && (
-        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-          <p>{t.noCourses || 'No hay cursos activos'}</p>
+          ))}
         </div>
+      ) : (
+        <ListaEstudiantes estudiantes={estudiantesFiltrados} isDark={isDark} />
       )}
     </div>
   );

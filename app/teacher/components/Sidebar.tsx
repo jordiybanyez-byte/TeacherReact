@@ -1,27 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useTheme } from './ThemeContext';
 
 interface SidebarProps {
+  isDark: boolean;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
 }
 
-interface MenuItem {
-  href?: string;
-  label: string;
-  icon: string;
-  isAccordion?: boolean;
-  isOpen?: boolean;
-  onToggle?: () => void;
-  children?: { href: string; label: string; icon: string }[];
-}
-
-function getIcon(icon: string, isActive: boolean) {
-  const color = isActive ? 'text-blue-400' : 'text-gray-500 dark:text-gray-400';
+function getIcon(icon: string, isActive: boolean, isDark: boolean) {
+  const color = isActive ? (isDark ? 'text-blue-400' : 'text-blue-600') : (isDark ? 'text-gray-400' : 'text-gray-500');
   
   switch (icon) {
     case 'home':
@@ -65,48 +56,130 @@ function getIcon(icon: string, isActive: boolean) {
   }
 }
 
-export function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps) {
+interface MenuItem {
+  href: string;
+  label: string;
+  icon: string;
+  children?: MenuItem[];
+}
+
+export function Sidebar({ isDark, isCollapsed, onToggleCollapse }: SidebarProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const { t } = useTheme();
-  const [zonaLectivaOpen, setZonaLectivaOpen] = useState(true);
-
-  const toggleZonaLectiva = () => {
-    setZonaLectivaOpen(!zonaLectivaOpen);
-    if (!zonaLectivaOpen && !pathname.startsWith('/teacher/ejercicios')) {
-      router.push('/teacher/ejercicios');
+  const [zonaEducativaAbierta, setZonaEducativaAbierta] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('sidebar-zona-educativa');
+      return saved === 'true';
     }
-  };
+    return false;
+  });
 
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     { href: '/teacher', label: t.inicio, icon: 'home' },
     { href: '/teacher/estudiantes', label: t.estudiantes, icon: 'users' },
-    { 
-      label: t.zonaLectiva || 'Zona Lectiva', 
-      icon: 'book',
-      isAccordion: true,
-      isOpen: zonaLectivaOpen,
-      onToggle: toggleZonaLectiva,
+    {
+      href: '/teacher/ejercicios',
+      label: t.zonaEducativa || 'Zona Educativa',
+      icon: 'clipboard',
       children: [
         { href: '/teacher/ejercicios', label: t.ejercicios, icon: 'clipboard' },
-        { href: '/teacher/ejercicios/lista', label: t.listaEjercicios, icon: 'clipboard' },
+        { href: '/teacher/ejercicios/lista', label: t.listaEjercicios || 'Lista de ejercicios', icon: 'clipboard' },
       ]
     },
     { href: '/teacher/hackathon', label: t.hackathon, icon: 'code' },
     { href: '/teacher/cursos', label: t.cursos, icon: 'book' },
-    { href: '/teacher/invitar', label: t.invitarAlumnos || 'Invitar Alumnos', icon: 'mail' },
+    { href: '/teacher/invitar', label: t.invitarAlumnos, icon: 'mail' },
   ];
 
+  const isZonaEducativaActive = pathname.startsWith('/teacher/ejercicios');
+
+  const toggleZonaEducativa = () => {
+    setZonaEducativaAbierta(prev => {
+      const newState = !prev;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('sidebar-zona-educativa', String(newState));
+      }
+      return newState;
+    });
+  };
+
+  const renderMenuItem = (item: MenuItem, isChild = false) => {
+    const isActive = pathname === item.href;
+    const hasChildren = item.children && item.children.length > 0;
+    const isOpen = zonaEducativaAbierta;
+    const shouldHighlight = hasChildren ? (isZonaEducativaActive || isOpen) : isActive;
+   
+
+    return (
+      <li key={item.href}>
+        {hasChildren && !isCollapsed ? (
+          <button
+            onClick={toggleZonaEducativa}
+            className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition ${
+              shouldHighlight
+                ? (isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900')
+                : (isDark ? 'text-gray-400 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-50')
+            }`}
+          >
+            {getIcon(item.icon, shouldHighlight, isDark)}
+            <span className="flex-1 text-left">{item.label}</span>
+            <svg
+              className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        ) : hasChildren && isCollapsed ? (
+          <Link
+            href={item.href}
+            className={`flex items-center justify-center gap-3 px-3 py-3 rounded-lg transition ${
+              shouldHighlight
+                ? (isDark ? 'bg-gray-700' : 'bg-gray-100')
+                : (isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50')
+            } justify-center`}
+          >
+            {getIcon(item.icon, shouldHighlight, isDark)}
+          </Link>
+        ) : (
+          <Link
+            href={item.href}
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition ${
+              isActive
+                ? (isDark ? 'bg-gray-700' : 'bg-gray-100')
+                : (isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50')
+            } ${isCollapsed ? 'justify-center' : ''} ${isChild ? (isDark ? 'ml-6 border-l-2 border-gray-600' : 'ml-6 border-l-2 border-gray-300') : ''}`}
+          >
+            {getIcon(item.icon, isActive, isDark)}
+            {!isCollapsed && (
+              <span className={isDark ? 'text-white' : 'text-gray-700'}>
+                {item.label}
+              </span>
+            )}
+          </Link>
+        )}
+        
+        {hasChildren && isOpen && !isCollapsed && (
+          <ul className="mt-1 space-y-1">
+            {item.children.map(child => renderMenuItem(child, true))}
+          </ul>
+        )}
+      </li>
+    );
+  };
+
   return (
-    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} min-h-screen border-r transition-all duration-300 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 flex flex-col`}>
-      <div className={`flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700`}>
+    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} min-h-screen border-r transition-all duration-300 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} flex flex-col`}>
+      <div className={`flex items-center justify-between p-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
         {!isCollapsed && (
           <>
             <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+              <h1 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 {t.teacherHub}
               </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                 {t.moocReact}
               </p>
             </div>
@@ -114,7 +187,7 @@ export function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps) {
         )}
         <button
           onClick={onToggleCollapse}
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400"
+          className={`p-2 rounded-lg transition ${isDark ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
         >
           <svg className="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transform: isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)' }}>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
@@ -122,97 +195,28 @@ export function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps) {
         </button>
       </div>
       
-      <nav className="flex-1 p-4 overflow-y-auto">
+      <nav className="flex-1 p-4">
         <ul className="space-y-2">
-          {menuItems.map((item, index) => {
-            if (item.isAccordion) {
-              const isActive = item.isOpen || pathname.startsWith('/teacher/ejercicios');
-              return (
-                <li key={`zona-lectiva-${index}`}>
-                  <button
-                    onClick={item.onToggle}
-                    className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition ${
-                      isActive
-                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
-                        : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-400'
-                    } ${isCollapsed ? 'justify-center' : ''}`}
-                  >
-                    {getIcon(item.icon, isActive)}
-                    {!isCollapsed && (
-                      <>
-                        <span className="flex-1 text-left">{item.label}</span>
-                        <svg 
-                          className={`w-4 h-4 transition-transform ${item.isOpen ? 'rotate-90' : ''}`}
-                          fill="none" 
-                          stroke="currentColor" 
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </>
-                    )}
-                  </button>
-                  {item.isOpen && !isCollapsed && item.children?.map((child) => {
-                    const isChildActive = pathname === child.href;
-                    return (
-                      <Link
-                        key={child.href}
-                        href={child.href}
-                        className={`flex items-center gap-3 px-3 py-3 ml-4 rounded-lg transition ${
-                          isChildActive
-                            ? 'bg-gray-100 dark:bg-gray-700'
-                            : 'hover:bg-gray-50 dark:hover:bg-gray-700'
-                        }`}
-                      >
-                        {getIcon(child.icon, isChildActive)}
-                        <span className="text-gray-900 dark:text-white">
-                          {child.label}
-                        </span>
-                      </Link>
-                    );
-                  })}
-                </li>
-              );
-            } else {
-              const isActive = pathname === item.href;
-              return (
-                <li key={item.href}>
-                  <Link
-                    href={item.href!}
-                    className={`flex items-center gap-3 px-3 py-3 rounded-lg transition ${
-                      isActive
-                        ? 'bg-gray-100 dark:bg-gray-700'
-                        : 'hover:bg-gray-50 dark:hover:bg-gray-700'
-                    } ${isCollapsed ? 'justify-center' : ''}`}
-                  >
-                    {getIcon(item.icon, isActive)}
-                    {!isCollapsed && (
-                      <span className="text-gray-900 dark:text-white">
-                        {item.label}
-                      </span>
-                    )}
-                  </Link>
-                </li>
-              );
-            }
-          })}
+          {menuItems.map(item => renderMenuItem(item))}
         </ul>
       </nav>
       
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="p-4 border-t border-gray-700">
         <button
           onClick={() => {
             localStorage.removeItem('theme');
             localStorage.removeItem('language');
-            window.location.href = '/';
+            window.location.href = '/login';
           }}
-          className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 ${isCollapsed ? 'justify-center' : ''}`}
+          className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition ${
+            isDark ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-50 text-gray-500'
+          } ${isCollapsed ? 'justify-center' : ''}`}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 013-3h4a3 3 0 013 3v1" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
           {!isCollapsed && (
-            <span className="text-gray-500 dark:text-gray-400">
+            <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>
               {t.cerrarSesion || 'Cerrar sesión'}
             </span>
           )}

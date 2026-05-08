@@ -12,6 +12,7 @@ export interface Estudiante {
   ejerciciosCompletados: number;
   ejerciciosTotales: number;
   notaPromedio: number;
+  cursoId: string;
 }
 
 export interface Filtros {

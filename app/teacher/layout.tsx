@@ -6,15 +6,15 @@ import { ThemeProvider, useTheme } from './components/ThemeContext';
 import { Language } from './components/i18n';
 
 function ThemeToggle() {
-  const { toggleTheme, t } = useTheme();
+  const { isDark, toggleTheme, t } = useTheme();
 
   return (
     <button
       onClick={toggleTheme}
-      title={typeof window !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark' ? t.temaClaro : t.temaOscuro}
-      className="p-2 rounded-lg transition bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+      title={isDark ? t.temaClaro : t.temaOscuro}
+      className={`p-2 rounded-lg transition ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
     >
-      {typeof window !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark' ? (
+      {isDark ? (
         <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
@@ -28,29 +28,18 @@ function ThemeToggle() {
 }
 
 function LanguageToggle() {
-  const { setLanguage, t } = useTheme();
-  const [currentLang, setCurrentLang] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('language') as 'es' | 'ca' | 'en' || 'es';
-    }
-    return 'es';
-  });
-
-  const handleSetLanguage = (lang: 'es' | 'ca' | 'en') => {
-    setLanguage(lang);
-    setCurrentLang(lang);
-  };
+  const { isDark, language, setLanguage, t } = useTheme();
 
   return (
     <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-700">
       {(['es', 'ca', 'en'] as const).map((lang) => (
         <button
           key={lang}
-          onClick={() => handleSetLanguage(lang)}
+          onClick={() => setLanguage(lang)}
           className={`px-2 py-1 text-sm rounded transition ${
-            currentLang === lang
+            language === lang
               ? 'bg-blue-600 text-white'
-              : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'
+              : isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
           }`}
         >
           {lang.toUpperCase()}
@@ -61,17 +50,47 @@ function LanguageToggle() {
 }
 
 function LayoutContent({ children }: { children: ReactNode }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isDark } = useTheme();
+  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Sidebar isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
-      <main className="flex-1 flex flex-col transition-all duration-300">
-        <header className="h-16 border-b flex items-center justify-end gap-3 px-6 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-          <LanguageToggle />
-          <ThemeToggle />
+    <div className={`flex min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+      <div className={`${mobileOpen ? 'fixed left-0 top-0 z-30 h-screen' : ''} ${isCollapsed ? 'w-16' : 'w-64'} md:static md:block ${isCollapsed && !mobileOpen ? 'hidden md:block' : 'block'}`}>
+        <Sidebar isDark={isDark} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)} />
+      </div>
+      <main className="flex-1 flex flex-col min-w-0 transition-all duration-300">
+        <header className={`h-16 border-b flex items-center justify-between gap-3 px-4 md:px-6 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className={`p-2 rounded-lg md:hidden transition ${isDark ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mobileOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+            </svg>
+          </button>
+          <div className="flex items-center gap-3">
+            <LanguageToggle />
+            <ThemeToggle />
+          </div>
         </header>
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-4 md:p-6 overflow-x-auto">
           {children}
         </div>
       </main>
@@ -80,6 +99,12 @@ function LayoutContent({ children }: { children: ReactNode }) {
 }
 
 export default function TeacherLayout({ children }: { children: ReactNode }) {
+  useEffect(() => {
+    const saved = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    const initial = saved || 'light';
+    document.documentElement.setAttribute('data-theme', initial);
+  }, []);
+
   return (
     <ThemeProvider>
       <LayoutContent>{children}</LayoutContent>

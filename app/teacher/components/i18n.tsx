@@ -1,22 +1,19 @@
 export type Language = 'es' | 'ca' | 'en';
 
 export interface Translations {
-  // Layout
   inicio: string;
   estudiantes: string;
+  ejercicios: string;
   hackathon: string;
   cursos: string;
   teacherHub: string;
   moocReact: string;
-  zonaLectiva: string;
   cerrarSesion: string;
   idioma: string;
   temaClaro: string;
   temaOscuro: string;
   note: string;
-
-  // General
-  ejercicios: string;
+  
   ejerciciosReact: string;
   ejerciciosCortos: string;
   verPista: string;
@@ -27,8 +24,7 @@ export interface Translations {
   ejercicioEnviado: string;
   enviarEjercicio: string;
   seleccionados: string;
-
-  // Students
+  
   gestionEstudiantes: string;
   administrarEstudiantes: string;
   total: string;
@@ -44,8 +40,7 @@ export interface Translations {
   ultimoAcceso: string;
   noEstudiantes: string;
   mostrarDe: string;
-
-  // Exercises
+  
   corregirEjercicios: string;
   revisarEjercicios: string;
   pending: string;
@@ -56,9 +51,7 @@ export interface Translations {
   reject: string;
   exerciseSubmited: string;
   noExercises: string;
-  listaEjercicios: string;
-
-  // Hackathon
+  
   gestionHackathon: string;
   adminHackathon: string;
   newHackathon: string;
@@ -85,8 +78,7 @@ export interface Translations {
   delete: string;
   teams: string;
   noEquipos: string;
-
-  // Courses
+  
   gestionCursos: string;
   adminCursos: string;
   newCourse: string;
@@ -104,18 +96,17 @@ export const translations: Record<Language, Translations> = {
   es: {
     inicio: 'Inicio',
     estudiantes: 'Estudiantes',
+    ejercicios: 'Ejercicios',
     hackathon: 'Hackathon',
     cursos: 'Cursos',
     teacherHub: 'Teacher Hub',
     moocReact: 'MOOC React',
-    zonaLectiva: 'Zona Lectiva',
-    cerrarSesion: 'Cerrar sesión',
     idioma: 'Idioma',
+    cerrarSesion: 'Cerrar sesión',
     temaClaro: 'Cambiar a tema claro',
     temaOscuro: 'Cambiar a tema oscuro',
     note: 'Nota',
-
-    ejercicios: 'Ejercicios',
+    
     ejerciciosReact: 'Ejercicios de React',
     ejerciciosCortos: 'Ejercicios cortos para practicar conceptos de React',
     verPista: 'Ver pista',
@@ -126,7 +117,7 @@ export const translations: Record<Language, Translations> = {
     ejercicioEnviado: 'Enviado',
     enviarEjercicio: 'Enviar ejercicio',
     seleccionados: 'seleccionados',
-
+    
     gestionEstudiantes: 'Gestión de Estudiantes',
     administrarEstudiantes: 'Administra los estudiantes del curso',
     total: 'Total',
@@ -142,7 +133,7 @@ export const translations: Record<Language, Translations> = {
     ultimoAcceso: 'Último Acceso',
     noEstudiantes: 'No se encontraron estudiantes',
     mostrarDe: 'Mostrando',
-
+    
     corregirEjercicios: 'Corrección de Ejercicios',
     revisarEjercicios: 'Revisa y corrige los ejercicios enviados',
     pending: 'pendiente',
@@ -153,8 +144,7 @@ export const translations: Record<Language, Translations> = {
     reject: 'Rechazar',
     exerciseSubmited: 'ejercicios',
     noExercises: 'No hay ejercicios',
-    listaEjercicios: 'Lista de ejercicios',
-
+    
     gestionHackathon: 'Gestión de Hackathon',
     adminHackathon: 'Administra hackathons y equipos',
     newHackathon: 'Nuevo Hackathon',
@@ -176,12 +166,14 @@ export const translations: Record<Language, Translations> = {
     listaAlumnos: 'Lista de alumnos',
     agregarCurso: 'Agregar a curso',
     noAlumnosInvitados: 'No hay alumnos invitados aún',
+    listaEjercicios: 'Lista de ejercicios',
+    zonaEducativa: 'Zona Educativa',
     deleteHackathon: 'Eliminar Hackathon',
     cancel: 'Cancelar',
     delete: 'Eliminar',
     teams: 'Equipos',
     noEquipos: 'No hay equipos en este hackathon',
-
+    
     gestionCursos: 'Gestión de Cursos',
     adminCursos: 'Crea y administra los cursos',
     newCourse: 'Nuevo Curso',
@@ -194,33 +186,20 @@ export const translations: Record<Language, Translations> = {
     inactive: 'inactivo',
     draft: 'borrador',
   },
-
   ca: {
     inicio: 'Inici',
     estudiantes: 'Estudiants',
+    ejercicios: 'Exercicis',
     hackathon: 'Hackathon',
     cursos: 'Cursos',
     teacherHub: 'Teacher Hub',
     moocReact: 'MOOC React',
-    zonaLectiva: 'Zona Llectiva',
-    cerrarSesion: 'Tancar sessió',
     idioma: 'Idioma',
+    cerrarSesion: 'Tancar sessió',
     temaClaro: 'Canviar a tema clar',
     temaOscuro: 'Canviar a tema fosc',
     note: 'Nota',
-
-    ejercicios: 'Exercicis',
-    ejerciciosReact: 'Exercicis de React',
-    ejerciciosCortos: 'Exercicis curts per practicar conceptes de React',
-    verPista: 'Veure pista',
-    verSolucion: 'Veure solució',
-    siguiente: 'Següent →',
-    enviarAEstudiantes: 'Enviar a estudiants',
-    seleccionarEstudiantes: 'Selecciona els estudiants que rebran aquest exercici:',
-    ejercicioEnviado: 'Enviat',
-    enviarEjercicio: 'Enviar exercici',
-    seleccionados: 'seleccionats',
-
+    
     gestionEstudiantes: "Gestió d'Estudiants",
     administrarEstudiantes: 'Administra els estudiants del curs',
     total: 'Total',
@@ -236,7 +215,18 @@ export const translations: Record<Language, Translations> = {
     ultimoAcceso: 'Darrer Accés',
     noEstudiantes: 'No es troben estudiants',
     mostrarDe: 'Mostrant',
-
+    
+    ejerciciosReact: 'Exercicis de React',
+    ejerciciosCortos: 'Exercicis curts per practicar conceptes de React',
+    verPista: 'Veure pista',
+    verSolucion: 'Veure solució',
+    siguiente: 'Següent →',
+    enviarAEstudiantes: 'Enviar a estudiants',
+    seleccionarEstudiantes: 'Selecciona els estudiants que rebran aquest exercici:',
+    ejercicioEnviado: 'Enviat',
+    enviarEjercicio: 'Enviar exercici',
+    seleccionados: 'seleccionats',
+    
     corregirEjercicios: "Correcció d'Exercicis",
     revisarEjercicios: 'Revisa i corregeix els exercicis enviats',
     pending: 'pendent',
@@ -247,14 +237,13 @@ export const translations: Record<Language, Translations> = {
     reject: 'Rebujar',
     exerciseSubmited: 'exercicis',
     noExercises: 'No hi ha exercicis',
-    listaEjercicios: 'Llista d\'exercicis',
-
+    
     gestionHackathon: 'Gestió de Hackathon',
     adminHackathon: 'Administra hackathons i equips',
     newHackathon: 'Nou Hackathon',
     selectHackathon: 'Seleccionar Hackathon',
     crearNuevoHackathon: 'Crear Nou Hackathon',
-    titulo: 'Títol',
+    titulo: 'Titol',
     descripcion: 'Descripció',
     fechaInicio: 'Data de inici',
     fechaFin: 'Data de fi',
@@ -270,12 +259,14 @@ export const translations: Record<Language, Translations> = {
     listaAlumnos: 'Llista d\'alumnes',
     agregarCurso: 'Afegir al curs',
     noAlumnosInvitados: 'No hi ha alumnes convidats encara',
+    listaEjercicios: 'Llista d\'exercicis',
+    zonaEducativa: 'Zona Educativa',
     deleteHackathon: 'Eliminar Hackathon',
     cancel: 'Cancelar',
     delete: 'Eliminar',
     teams: 'Equips',
     noEquipos: 'No hi ha equips en aquest hackathon',
-
+    
     gestionCursos: 'Gestió de Cursos',
     adminCursos: 'Crea i administra els cursos',
     newCourse: 'Nou Curs',
@@ -288,33 +279,20 @@ export const translations: Record<Language, Translations> = {
     inactive: 'inactiu',
     draft: 'esborrany',
   },
-
   en: {
     inicio: 'Home',
     estudiantes: 'Students',
+    ejercicios: 'Exercises',
     hackathon: 'Hackathon',
     cursos: 'Courses',
     teacherHub: 'Teacher Hub',
     moocReact: 'MOOC React',
-    zonaLectiva: 'Learning Zone',
-    cerrarSesion: 'Logout',
     idioma: 'Language',
+    cerrarSesion: 'Logout',
     temaClaro: 'Switch to light theme',
     temaOscuro: 'Switch to dark theme',
     note: 'Grade',
-
-    ejercicios: 'Exercises',
-    ejerciciosReact: 'React Exercises',
-    ejerciciosCortos: 'Short exercises to practice React concepts',
-    verPista: 'Show hint',
-    verSolucion: 'Show solution',
-    siguiente: 'Next →',
-    enviarAEstudiantes: 'Send to students',
-    seleccionarEstudiantes: 'Select the students who will receive this exercise:',
-    ejercicioEnviado: 'Sent',
-    enviarEjercicio: 'Send exercise',
-    seleccionados: 'selected',
-
+    
     gestionEstudiantes: 'Student Management',
     administrarEstudiantes: 'Manage course students',
     total: 'Total',
@@ -330,7 +308,18 @@ export const translations: Record<Language, Translations> = {
     ultimoAcceso: 'Last Access',
     noEstudiantes: 'No students found',
     mostrarDe: 'Showing',
-
+    
+    ejerciciosReact: 'React Exercises',
+    ejerciciosCortos: 'Short exercises to practice React concepts',
+    verPista: 'Show hint',
+    verSolucion: 'Show solution',
+    siguiente: 'Next →',
+    enviarAEstudiantes: 'Send to students',
+    seleccionarEstudiantes: 'Select the students who will receive this exercise:',
+    ejercicioEnviado: 'Sent',
+    enviarEjercicio: 'Send exercise',
+    seleccionados: 'selected',
+    
     corregirEjercicios: 'Exercise Correction',
     revisarEjercicios: 'Review and grade student exercises',
     pending: 'pending',
@@ -341,8 +330,7 @@ export const translations: Record<Language, Translations> = {
     reject: 'Reject',
     exerciseSubmited: 'exercises',
     noExercises: 'No exercises',
-    listaEjercicios: 'Exercise List',
-
+    
     gestionHackathon: 'Hackathon Management',
     adminHackathon: 'Manage hackathons and teams',
     newHackathon: 'New Hackathon',
@@ -364,12 +352,15 @@ export const translations: Record<Language, Translations> = {
     listaAlumnos: 'Students list',
     agregarCurso: 'Add to course',
     noAlumnosInvitados: 'No students invited yet',
+    listaEjercicios: 'Exercises list',
+    zonaEducativa: 'Educational Zone',
     deleteHackathon: 'Delete Hackathon',
     cancel: 'Cancel',
     delete: 'Delete',
     teams: 'Teams',
     noEquipos: 'No teams in this hackathon',
-
+    cerrarSesion: 'Logout',
+    
     gestionCursos: 'Course Management',
     adminCursos: 'Create and manage courses',
     newCourse: 'New Course',

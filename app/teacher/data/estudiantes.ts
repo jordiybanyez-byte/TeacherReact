@@ -1,5 +1,11 @@
 import { Estudiante } from '../types/estudiante';
 
+const cursosIds = ['1', '2', '3'];
+
+function asignarCursoAleatorio(): string {
+  return cursosIds[Math.floor(Math.random() * cursosIds.length)];
+}
+
 export const estudiantes: Estudiante[] = [
   {
     id: '1',
@@ -13,6 +19,7 @@ export const estudiantes: Estudiante[] = [
     ejerciciosCompletados: 45,
     ejerciciosTotales: 60,
     notaPromedio: 92,
+    cursoId: asignarCursoAleatorio(),
   },
   {
     id: '2',
@@ -26,6 +33,7 @@ export const estudiantes: Estudiante[] = [
     ejerciciosCompletados: 27,
     ejerciciosTotales: 60,
     notaPromedio: 78,
+    cursoId: asignarCursoAleatorio(),
   },
   {
     id: '3',
@@ -39,6 +47,7 @@ export const estudiantes: Estudiante[] = [
     ejerciciosCompletados: 60,
     ejerciciosTotales: 60,
     notaPromedio: 95,
+    cursoId: asignarCursoAleatorio(),
   },
   {
     id: '4',
@@ -52,6 +61,7 @@ export const estudiantes: Estudiante[] = [
     ejerciciosCompletados: 12,
     ejerciciosTotales: 60,
     notaPromedio: 65,
+    cursoId: asignarCursoAleatorio(),
   },
   {
     id: '5',
@@ -65,6 +75,7 @@ export const estudiantes: Estudiante[] = [
     ejerciciosCompletados: 36,
     ejerciciosTotales: 60,
     notaPromedio: 85,
+    cursoId: asignarCursoAleatorio(),
   },
   {
     id: '6',
@@ -78,6 +89,7 @@ export const estudiantes: Estudiante[] = [
     ejerciciosCompletados: 6,
     ejerciciosTotales: 60,
     notaPromedio: 0,
+    cursoId: asignarCursoAleatorio(),
   },
   {
     id: '7',
@@ -91,6 +103,7 @@ export const estudiantes: Estudiante[] = [
     ejerciciosCompletados: 54,
     ejerciciosTotales: 60,
     notaPromedio: 88,
+    cursoId: asignarCursoAleatorio(),
   },
   {
     id: '8',
@@ -104,6 +117,7 @@ export const estudiantes: Estudiante[] = [
     ejerciciosCompletados: 60,
     ejerciciosTotales: 60,
     notaPromedio: 97,
+    cursoId: asignarCursoAleatorio(),
   },
   {
     id: '9',
@@ -117,6 +131,7 @@ export const estudiantes: Estudiante[] = [
     ejerciciosCompletados: 21,
     ejerciciosTotales: 60,
     notaPromedio: 72,
+    cursoId: asignarCursoAleatorio(),
   },
   {
     id: '10',
@@ -130,6 +145,7 @@ export const estudiantes: Estudiante[] = [
     ejerciciosCompletados: 3,
     ejerciciosTotales: 60,
     notaPromedio: 50,
+    cursoId: asignarCursoAleatorio(),
   },
   {
     id: '11',
@@ -143,6 +159,7 @@ export const estudiantes: Estudiante[] = [
     ejerciciosCompletados: 33,
     ejerciciosTotales: 60,
     notaPromedio: 80,
+    cursoId: asignarCursoAleatorio(),
   },
   {
     id: '12',
@@ -156,5 +173,6 @@ export const estudiantes: Estudiante[] = [
     ejerciciosCompletados: 0,
     ejerciciosTotales: 60,
     notaPromedio: 0,
+    cursoId: asignarCursoAleatorio(),
   },
 ];
